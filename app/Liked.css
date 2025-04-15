@@ -1,0 +1,132 @@
+/* --------------------------- */
+/* Container Layout            */
+/* --------------------------- */
+
+/* Main wrapper for the liked page content */
+.liked-container {
+  display: flex;                     /* Horizontal layout */
+  flex: 1;
+  overflow: hidden;                 /* Prevent scrollbars on main container */
+  height: calc(100vh - 120px);      /* Fills screen minus header/footer height */
+  box-sizing: border-box;
+}
+
+/* Left panel for the liked books table */
+.table-container {
+  flex: 1;
+  max-width: 40%;                   /* Takes up 40% of horizontal space */
+  overflow-y: auto;                 /* Makes table scrollable */
+  margin-right: 1rem;              /* Space between table and details */
+  box-sizing: border-box;
+}
+
+/* Right panel for book details */
+.details-container {
+  flex: 1;
+  overflow-y: auto;                 /* Makes book info scrollable */
+  padding: 2rem 2rem 2.5rem 2rem;   /* Top, Right, Bottom, Left */
+  box-sizing: border-box;
+}
+
+/* --------------------------- */
+/* Custom Scrollbars (Webkit)  */
+/* --------------------------- */
+
+/* Scrollbar width for both table and detail panel */
+.table-container::-webkit-scrollbar,
+.details-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Scrollbar track color */
+.table-container::-webkit-scrollbar-track,
+.details-container::-webkit-scrollbar-track {
+  background: #f44336;              /* Matches red theme */
+}
+
+/* Scrollbar thumb styling */
+.table-container::-webkit-scrollbar-thumb,
+.details-container::-webkit-scrollbar-thumb {
+  background-color: #333;           /* Dark grey thumb */
+  border-radius: 4px;
+  border: 1px solid #333;
+}
+
+/* Scrollbar thumb hover effect */
+.table-container::-webkit-scrollbar-thumb:hover,
+.details-container::-webkit-scrollbar-thumb:hover {
+  background-color: #f1f1f1;        /* Lighter on hover */
+}
+
+/* --------------------------- */
+/* Table Styling               */
+/* --------------------------- */
+
+table {
+  width: 100%;
+  border-collapse: collapse;        /* Removes gaps between borders */
+  font-family: inherit;
+}
+
+th,
+td {
+  border: 2px solid black;
+  padding: 12px 16px;
+  text-align: left;
+  color: white;
+}
+
+/* Header row style */
+th {
+  background-color: #f44336;
+  font-weight: bold;
+}
+
+/* Row styling */
+tr {
+  background-color: #f44336;
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Row hover effect */
+tr:hover {
+  background-color: #d32f2f;
+  cursor: pointer;
+}
+
+/* --------------------------- */
+/* Book Cover Image Styling    */
+/* --------------------------- */
+
+.book-cover {
+  max-width: 300px;
+  margin-bottom: 1rem;
+  border: 2px solid black;
+}
+
+/* --------------------------- */
+/* Buttons (Compare / Remove)  */
+/* --------------------------- */
+
+.buy-buttons {
+  display: flex;
+  gap: 1rem;                        /* Space between buttons */
+  margin-top: 1rem;
+}
+
+.buy-link {
+  background-color: #f44336;        /* Red background */
+  color: white;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  border: 2px solid black;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: transform 0.2s;       /* Slight animation on hover */
+}
+
+/* Button hover effect */
+.buy-link:hover {
+  transform: scale(1.05);           /* Grows slightly */
+  cursor: pointer;
+}

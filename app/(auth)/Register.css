@@ -1,0 +1,91 @@
+/* src/Register.css */
+.register-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #e8e8e8;
+}
+
+.register-header {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+}
+
+.register-input {
+  padding: 10px;
+  margin-bottom: 15px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.error-message {
+  color: red;
+  margin-bottom: 15px;
+}
+
+.button-container {
+  display: flex;
+  gap: 10px;
+}
+
+.register-button,
+.back-button {
+  flex: 1;
+  padding: 10px;
+  font-size: 1rem;
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.register-button:hover,
+.back-button:hover {
+  background-color: #f44336;
+}
+
+.g-signin-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.g-signin-btn {
+  display: flex;
+  align-items: center;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  padding: 10px 15px;
+  cursor: pointer;
+  background-color: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+  transition: background-color 0.2s ease;
+}
+
+.g-signin-btn:hover {
+  background-color: #f7f8f9;
+}
+
+.g-logo {
+  height: 20px;
+  margin-right: 10px;
+}
+
+.g-text {
+  color: #3c4043;
+  font-weight: 500;
+}

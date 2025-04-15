@@ -1,0 +1,74 @@
+/* src/Login.css */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+  }
+  
+  .login-header {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+  }
+  
+  .login-input {
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  /* Container for the two buttons */
+  .button-container {
+    display: flex;
+    gap: 10px;
+  }
+  
+  /* Shared styles for both buttons */
+  .login-button,
+  .register-button {
+    flex: 1;
+    padding: 10px;
+    font-size: 1rem;
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .login-button:hover,
+  .register-button:hover {
+    background-color: #f44336;
+  }
+  
+  .google-login-button {
+    margin-top: 1rem;
+    padding: 10px 16px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    color: #444;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+  }
+  
+  .google-login-button:hover {
+    background-color: #f1f1f1;
+  }
+  

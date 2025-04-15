@@ -1,0 +1,64 @@
+/* src/css/leftnav.css */
+.left-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: #333;
+  color: white;
+  overflow: hidden;
+  transition: width 0.3s ease;
+  z-index: 1000;
+  border-right: 1px solid black;
+}
+
+.left-nav.expanded {
+  width: 200px;
+}
+
+.left-nav.collapsed {
+  width: 60px;
+}
+
+.hamburger {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  padding: 10px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.left-nav nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 0;
+}
+
+.left-nav nav ul li {
+  margin: 0;
+}
+
+.left-nav nav ul li a {
+  display: flex;
+  align-items: center;
+  color: white;
+  text-decoration: none;
+  padding: 10px;
+  transition: background 0.2s;
+}
+
+.left-nav nav ul li a:hover {
+  background-color: #444;
+}
+
+.icon {
+  font-size: 2rem;
+  margin-right: 10px;
+}
+
+.label {
+  font-size: 1rem;
+}

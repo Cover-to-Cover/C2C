@@ -1,0 +1,66 @@
+/* Container styling for the page */
+.profiles-container {
+    padding: 1rem;
+    font-family: sans-serif;
+  }
+  
+  /* Profile section layout */
+  .profile-content {
+    margin-top: 1rem;
+  }
+  
+  /* Headings */
+  h1, h2 {
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Buttons: matching style for Logout & Change Password */
+  .logout-button,
+  .change-password-button {
+    background-color: #f44336; /* red background */
+    color: white;
+    padding: 0.5rem 1rem;
+    border: 2px solid black;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: transform 0.2s;
+    cursor: pointer;
+    margin-right: 1rem;
+    margin-top: 0.5rem;
+  }
+  
+  /* Hover effect */
+  .logout-button:hover,
+  .change-password-button:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Form styling for "Change Password" */
+  .password-form {
+    margin-top: 1rem;
+    max-width: 300px; /* optional, so form doesn't stretch too wide */
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-weight: bold;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 0.4rem;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  /* Password status message */
+  .password-message {
+    margin-top: 0.5rem;
+    font-weight: bold;
+  }
+  
