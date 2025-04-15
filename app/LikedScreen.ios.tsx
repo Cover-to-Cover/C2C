@@ -1,5 +1,7 @@
-// app/liked.tsx
-import React, { useEffect, useState, useRef } from 'react';
+// app/LikedScreen.ios.tsx
+// This screen displays the user's list of liked books and allows for viewing extended details
+// via a slide-in animation, handling swipe gestures for back navigation, and removing a book.
+import React, { useEffect, useState, useRef } from 'react'; // Import React and hooks for state, effects, and references.
 import {
   View,
   Text,
@@ -12,36 +14,48 @@ import {
   Animated,
   Dimensions,
   PanResponder,
-} from 'react-native';
-import { supabase } from '../lib/supabaseClient';
-import { useRouter } from 'expo-router';
-import { FontAwesome } from '@expo/vector-icons';
+} from 'react-native'; // Import various React Native components and APIs for UI, animations, gestures, etc.
+import { supabase } from '../lib/supabaseClient'; // Import the Supabase client for backend operations.
+import { useRouter } from 'expo-router'; // Import the router hook to handle navigation.
+import { FontAwesome } from '@expo/vector-icons'; // Import FontAwesome icons for UI elements.
 
+// Define a TypeScript interface that represents a liked book.
 interface LikedBook {
   isbn: string;
   title: string;
   author: string;
-  cover_id?: number;
-  description?: string;
-  openLibraryLink?: string;
-  isbn13?: string;
+  cover_id?: number;            // Optional cover ID to display the book cover.
+  description?: string;         // Optional extended description of the book.
+  openLibraryLink?: string;     // Optional link to the Open Library page for the book.
+  isbn13?: string;              // Optional ISBN-13 for further details or comparison offers.
 }
 
 export default function LikedScreen() {
+  // State to hold the current user's ID.
   const [userId, setUserId] = useState('');
+  // State to store the list of liked books.
   const [likedBooks, setLikedBooks] = useState<LikedBook[]>([]);
+  // State to store the currently selected book's extended details.
   const [selectedBook, setSelectedBook] = useState<LikedBook | null>(null);
+
+  // Hook to manage navigation.
   const router = useRouter();
 
-  // Slide animation setup.
+  // Set up an Animated value for the slide-in effect.
+  // Starts off the screen to the right by setting the initial value to the window width.
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current;
+  // Retrieve screen width for later use in animation.
   const screenWidth = Dimensions.get('window').width;
 
-  // Set up PanResponder to detect left-to-right swipe.
+  // Set up PanResponder to detect left-to-right swipe gestures.
+  // When a significant horizontal swipe is detected, trigger the "back" functionality.
   const panResponder = useRef(
     PanResponder.create({
+      // Decide when a gesture should be handled.
       onMoveShouldSetPanResponder: (evt, gestureState) =>
+        // Only activate if horizontal movement is greater than vertical movement and the swipe is to the right.
         Math.abs(gestureState.dx) > Math.abs(gestureState.dy) && gestureState.dx > 20,
+      // When the gesture is released, check if the swipe distance is enough to go back.
       onPanResponderRelease: (evt, gestureState) => {
         if (gestureState.dx > 50) {
           handleBack();
@@ -50,7 +64,8 @@ export default function LikedScreen() {
     })
   ).current;
 
-  // Check for an active session and set the userId, or redirect to login.
+  // Check for an active session on mount.
+  // If a session is found, update userId; otherwise, redirect to the login screen.
   useEffect(() => {
     const getUser = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
@@ -64,9 +79,9 @@ export default function LikedScreen() {
     getUser();
   }, [router]);
 
-  // Fetch liked books for the current user.
+  // Fetch liked books for the current user once userId is set.
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) return; // Exit early if userId is not yet available.
     const fetchBooks = async () => {
       const { data, error } = await supabase
         .from('user_books')
@@ -77,18 +92,21 @@ export default function LikedScreen() {
         console.error('Error fetching liked books:', error.message);
         return;
       }
+      // Update likedBooks state with fetched data.
       setLikedBooks(data || []);
     };
     fetchBooks();
   }, [userId]);
 
-  // When a row is clicked: fetch extended details for the book then slide in.
+  // When a row is clicked in the list, fetch extended details from Open Library and slide in the details panel.
   const handleRowClick = async (book: LikedBook) => {
-    setSelectedBook(null); // Clear previous selection while loading.
+    setSelectedBook(null); // Clear any previous selection while loading new details.
     try {
+      // Fetch core work details from Open Library using the book's ISBN.
       const workRes = await fetch(`https://openlibrary.org/works/${book.isbn}.json`);
       const workData = await workRes.json();
       let isbn13 = '';
+      // Try to fetch the ISBN-13 by querying the editions endpoint.
       try {
         const editionsRes = await fetch(`https://openlibrary.org/works/${book.isbn}/editions.json?limit=1`);
         const editionsData = await editionsRes.json();
@@ -98,6 +116,7 @@ export default function LikedScreen() {
       } catch (err) {
         console.warn('Could not fetch ISBN-13 from editions.');
       }
+      // Construct an extended book object with additional details.
       const extendedBook: LikedBook = {
         ...book,
         description:
@@ -108,34 +127,37 @@ export default function LikedScreen() {
         openLibraryLink: `https://openlibrary.org/works/${book.isbn}`,
         isbn13,
       };
+      // Update the selectedBook state to display details.
       setSelectedBook(extendedBook);
-      // Animate slide in: from screenWidth to 0.
+      // Animate the slide in effect from the right (screenWidth) to zero.
       Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 300,
+        toValue: 0, // Slide to position 0 (fully in view).
+        duration: 300, // Animation lasts 300ms.
         useNativeDriver: true,
       }).start();
     } catch (err) {
       console.error('Error fetching OpenLibrary data:', err);
+      // If there's an error, set selectedBook with a fallback description.
       setSelectedBook({ ...book, description: 'No description available.' });
     }
   };
 
-  // When the back arrow or swipe is triggered, slide out then clear selection.
+  // Handle the "back" action: slide out the details view and clear the selection.
   const handleBack = () => {
     Animated.timing(slideAnim, {
-      toValue: screenWidth,
-      duration: 300,
+      toValue: screenWidth, // Slide the details view off to the right.
+      duration: 300, // Animation lasts 300ms.
       useNativeDriver: true,
     }).start(() => {
-      setSelectedBook(null);
-      slideAnim.setValue(screenWidth);
+      setSelectedBook(null); // Clear the selection after animation completes.
+      slideAnim.setValue(screenWidth); // Reset the animated value to the off-screen position.
     });
   };
 
   // Remove a book from the liked list.
   const handleRemove = async () => {
-    if (!selectedBook) return;
+    if (!selectedBook) return; // Do nothing if there is no book selected.
+    // Delete the book record from the Supabase 'user_books' table.
     const { error } = await supabase
       .from('user_books')
       .delete()
@@ -145,10 +167,12 @@ export default function LikedScreen() {
       console.error('Error deleting record:', error.message);
       return;
     }
+    // Update local state by filtering out the removed book.
     setLikedBooks(likedBooks.filter(book => book.isbn !== selectedBook.isbn));
-    handleBack(); // Return to list after removal.
+    handleBack(); // Navigate back to the list view after removal.
   };
 
+  // Confirm removal before deleting the book using an alert.
   const handleRemoveClick = () => {
     Alert.alert(
       "Confirm Removal",
@@ -160,26 +184,30 @@ export default function LikedScreen() {
     );
   };
 
+  // Open an external URL for comparing offers if ISBN-13 is available.
   const handleCompareOffers = () => {
     if (selectedBook && selectedBook.isbn13) {
       Linking.openURL(`https://www.directtextbook.com/isbn/${selectedBook.isbn13}`);
     }
   };
 
-  // List view when no book is selected.
+  // If no book is selected, render the list view.
   if (!selectedBook) {
     return (
       <View style={styles.listContainer}>
         <ScrollView contentContainerStyle={styles.tableContainer}>
+          {/* Table header for the list */}
           <View style={styles.tableHeader}>
             <Text style={[styles.tableCell, styles.headerCell]}>Title</Text>
             <Text style={[styles.tableCell, styles.headerCell]}>Author</Text>
           </View>
+          {/* If there are no liked books, display a message */}
           {likedBooks.length === 0 ? (
             <View style={styles.tableRow}>
               <Text style={styles.tableCell}>No liked books found.</Text>
             </View>
           ) : (
+            // Render each liked book as a row in the table.
             likedBooks.map((book) => (
               <TouchableOpacity
                 key={book.isbn}
@@ -196,16 +224,18 @@ export default function LikedScreen() {
     );
   }
 
-  // Details view with slide-in animation and pan responder to detect swipe.
+  // If a book is selected, render the details view with a slide-in animation.
   return (
     <Animated.View
       style={[styles.detailsContainer, { transform: [{ translateX: slideAnim }] }]}
-      {...panResponder.panHandlers}
+      {...panResponder.panHandlers} // Attach pan handlers to detect swipe gestures.
     >
+      {/* Back button to exit the details view */}
       <TouchableOpacity style={styles.backButton} onPress={handleBack}>
         <FontAwesome name="arrow-left" size={24} color="#333" />
       </TouchableOpacity>
       <ScrollView contentContainerStyle={styles.detailsContent}>
+        {/* Display book cover if available */}
         {selectedBook.cover_id && (
           <Image
             source={{ uri: `https://covers.openlibrary.org/b/id/${selectedBook.cover_id}-L.jpg` }}
@@ -213,9 +243,12 @@ export default function LikedScreen() {
             resizeMode="contain"
           />
         )}
+        {/* Show title and author */}
         <Text style={styles.detailTitle}>{selectedBook.title}</Text>
         <Text style={styles.detailAuthor}>by {selectedBook.author}</Text>
+        {/* Show book description */}
         <Text style={styles.detailDescription}>{selectedBook.description}</Text>
+        {/* Buttons for external link and removal */}
         <View style={styles.buttonRow}>
           {selectedBook.isbn13 && (
             <TouchableOpacity style={styles.linkButton} onPress={handleCompareOffers}>
@@ -231,25 +264,26 @@ export default function LikedScreen() {
   );
 }
 
+// Define styles for the component.
 const styles = StyleSheet.create({
   listContainer: {
-    flex: 1,
+    flex: 1,                     // Fill the entire screen.
     padding: 10,
-    backgroundColor: '#f0f4f7',
+    backgroundColor: '#f0f4f7',   // Light background color.
   },
   tableContainer: {
     padding: 10,
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#f44336',
+    backgroundColor: '#f44336',   // Red background for header.
     borderWidth: 2,
     borderColor: 'black',
     paddingVertical: 8,
   },
   tableRow: {
     flexDirection: 'row',
-    backgroundColor: '#f44336',
+    backgroundColor: '#f44336',   // Red background for rows.
     borderWidth: 2,
     borderColor: 'black',
     paddingVertical: 8,
@@ -258,15 +292,15 @@ const styles = StyleSheet.create({
   tableCell: {
     flex: 1,
     paddingHorizontal: 8,
-    color: 'white',
+    color: 'white',              // White text for contrast.
     fontSize: 14,
   },
   headerCell: {
-    fontWeight: 'bold',
+    fontWeight: 'bold',          // Bold header text.
   },
   detailsContainer: {
     flex: 1,
-    backgroundColor: '#f0f4f7',
+    backgroundColor: '#f0f4f7',   // Light background.
     paddingTop: 40,
   },
   backButton: {
@@ -312,7 +346,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   linkButton: {
-    backgroundColor: '#f44336',
+    backgroundColor: '#f44336',  // Red button background.
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderWidth: 2,

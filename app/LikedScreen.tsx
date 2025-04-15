@@ -1,53 +1,56 @@
-import React, { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
-import { useRouter } from 'expo-router';
-import './Liked.css';
-import { navigate } from 'expo-router/build/global-state/routing';
+// app/LikedScreen.tsx
+import React, { useEffect, useState } from 'react'; // Import React and hooks to manage component state and side effects.
+import { supabase } from '../lib/supabaseClient'; // Import the Supabase client for backend operations.
+import { useRouter } from 'expo-router'; // Import the router hook to navigate between screens.
+import './Liked.css'; // Import the CSS file for styling this component.
+import { navigate } from 'expo-router/build/global-state/routing'; // Import the navigate function (if needed) for navigation state.
 
-// Define the structure of a liked book
+// Define the structure of a liked book.
 interface LikedBook {
   isbn: string;
   title: string;
   author: string;
-  cover_id?: number;
-  description?: string;
-  openLibraryLink?: string;
-  isbn13?: string;
+  cover_id?: number;            // Optional cover ID for displaying the book cover.
+  description?: string;         // Optional description of the book.
+  openLibraryLink?: string;     // Optional link to the book's details on Open Library.
+  isbn13?: string;              // Optional ISBN-13 for further offers/comparisons.
 }
 
 const Liked: React.FC = () => {
-  // State to hold current user's ID
+  // State to hold the current user's ID.
   const [userId, setUserId] = useState('');
-
-  // State to store liked books
+  // State to store the list of liked books fetched from the backend.
   const [likedBooks, setLikedBooks] = useState<LikedBook[]>([]);
-
-  // State to store the currently selected book's details
+  // State to store details of the currently selected book.
   const [selectedBook, setSelectedBook] = useState<LikedBook | null>(null);
 
-  const router = useRouter();
+  const router = useRouter(); // Get the router instance for redirection.
 
-  // On mount: fetch the user's session and redirect to login if not found
+  // On component mount, fetch the user's session data.
   useEffect(() => {
     const getUser = async () => {
+      // Retrieve the current session from Supabase.
       const { data: { session }, error } = await supabase.auth.getSession();
 
       if (error) console.error('Error getting session:', error);
+      // If no user session exists, redirect to the login screen.
       if (!session?.user?.id) {
         router.push('/LoginScreen');
         return;
       }
 
+      // Store the user's ID for later use in fetching liked books.
       setUserId(session.user.id);
     };
     getUser();
-  }, [navigate]);
+  }, [navigate]); // Dependency on 'navigate' (although router is used directly).
 
-  // When userId is set: fetch the list of liked books from Supabase
+  // When userId is available, fetch the list of liked books from Supabase.
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) return; // Do nothing if userId is not yet set.
 
     const fetchBooks = async () => {
+      // Query the 'user_books' table in Supabase to get liked books for the user.
       const { data, error } = await supabase
         .from('user_books')
         .select('isbn, title, author')
@@ -59,17 +62,20 @@ const Liked: React.FC = () => {
         return;
       }
 
+      // Update local state with the fetched liked books.
       setLikedBooks(data);
     };
 
     fetchBooks();
   }, [userId]);
 
-  // When userId is set: fetch the list of liked books from Supabase
+  // NOTE: This second useEffect appears to duplicate the previous fetching of liked books.
+  // It additionally auto-loads the first book's details if available.
   useEffect(() => {
     if (!userId) return;
 
     const fetchBooks = async () => {
+      // Query Supabase for liked books for the current user.
       const { data, error } = await supabase
         .from('user_books')
         .select('isbn, title, author')
@@ -81,9 +87,10 @@ const Liked: React.FC = () => {
         return;
       }
 
+      // Update the local state with the list of liked books.
       setLikedBooks(data);
 
-      // Automatically load the first book's details if available
+      // Automatically load the first book's details if any are returned.
       if (data && data.length > 0) {
         handleRowClick(data[0]);
       }
@@ -92,17 +99,19 @@ const Liked: React.FC = () => {
     fetchBooks();
   }, [userId]);
 
-  // When a row is clicked: fetch full book data from Open Library
+  // Function to handle a row click in the liked books table.
+  // It fetches additional details from Open Library for the selected book.
   const handleRowClick = async (book: LikedBook) => {
-    setSelectedBook(null); // Clear previous selection while loading
+    setSelectedBook(null); // Clear any previous selection while loading new data.
 
     try {
+      // Fetch work details from Open Library using the book's ISBN.
       const workRes = await fetch(`https://openlibrary.org/works/${book.isbn}.json`);
       const workData = await workRes.json();
 
       let isbn13 = '';
 
-      // Try to get the ISBN-13 from editions endpoint
+      // Attempt to fetch the ISBN-13 from the editions endpoint.
       try {
         const editionsRes = await fetch(`https://openlibrary.org/works/${book.isbn}/editions.json?limit=1`);
         const editionsData = await editionsRes.json();
@@ -113,27 +122,30 @@ const Liked: React.FC = () => {
         console.warn('Could not fetch ISBN-13 from editions.');
       }
 
-      // Update selected book with extended details
+      // Update the selected book state with extended details from Open Library.
       setSelectedBook({
-        ...book,
+        ...book,  // Include original book properties.
         description:
+          // Check the type of description in the response.
           typeof workData.description === 'string'
             ? workData.description
             : workData.description?.value || 'No description available.',
-        cover_id: workData.covers?.[0],
-        openLibraryLink: `https://openlibrary.org/works/${book.isbn}`,
-        isbn13,
+        cover_id: workData.covers?.[0], // Use the first cover image ID if available.
+        openLibraryLink: `https://openlibrary.org/works/${book.isbn}`, // Construct a link to Open Library.
+        isbn13,  // Add the ISBN-13 if fetched.
       });
     } catch (err) {
       console.error('Error fetching OpenLibrary data:', err);
+      // In case of an error, update selected book with a fallback description.
       setSelectedBook({ ...book, description: 'No description available.' });
     }
   };
 
-  // Remove the book from Supabase and update local state
+  // Function to handle the removal of a liked book.
   const handleRemove = async () => {
-    if (!selectedBook) return;
+    if (!selectedBook) return; // Do nothing if no book is selected.
 
+    // Delete the record from the 'user_books' table in Supabase.
     const { error } = await supabase
       .from('user_books')
       .delete()
@@ -145,21 +157,24 @@ const Liked: React.FC = () => {
       return;
     }
 
-    // Remove book from the local list and clear the selection
+    // Update local state by removing the deleted book from the list.
     setLikedBooks(likedBooks.filter(book => book.isbn !== selectedBook.isbn));
+    // Clear the current selected book.
     setSelectedBook(null);
   };
 
-  // Confirm before removing a book from the liked list
+  // Function to confirm and handle removal on button click.
   const handleRemoveClick = () => {
+    // Ask the user for confirmation before removing the book.
     if (window.confirm("Are you sure you want to remove this book from your list?")) {
       handleRemove();
     }
   };
 
+  // Component render
   return (
     <div className="liked-container">
-      {/* Book list table */}
+      {/* Table displaying the list of liked books */}
       <div className="table-container">
         <table>
           <thead>
@@ -169,11 +184,13 @@ const Liked: React.FC = () => {
             </tr>
           </thead>
           <tbody>
+            {/* If no liked books are found, show a message */}
             {likedBooks.length === 0 ? (
               <tr>
                 <td colSpan={3}>No liked books found.</td>
               </tr>
             ) : (
+              // Map over liked books to create table rows.
               likedBooks.map((book) => (
                 <tr key={book.isbn} onClick={() => handleRowClick(book)}>
                   <td>{book.title}</td>
@@ -185,9 +202,10 @@ const Liked: React.FC = () => {
         </table>
       </div>
 
-      {/* Book details panel */}
+      {/* Panel displaying detailed information about the selected book */}
       {selectedBook && (
         <div className="details-container">
+          {/* Show the book cover image if cover_id is available */}
           {selectedBook.cover_id && (
             <img
               src={`https://covers.openlibrary.org/b/id/${selectedBook.cover_id}-L.jpg`}
@@ -195,12 +213,15 @@ const Liked: React.FC = () => {
               className="book-cover"
             />
           )}
+          {/* Display book title and author */}
           <h2>{selectedBook.title}</h2>
           <h4>by {selectedBook.author}</h4>
+          {/* Display the book description */}
           <p>{selectedBook.description}</p>
 
-          {/* Buttons for external link and removal */}
+          {/* Section with links/buttons for further actions */}
           <div className="buy-buttons">
+            {/* If ISBN-13 is available, provide a link to compare offers */}
             {selectedBook.isbn13 && (
               <a
                 href={`https://www.directtextbook.com/isbn/${selectedBook.isbn13}`}
@@ -211,6 +232,7 @@ const Liked: React.FC = () => {
                 Compare Offers
               </a>
             )}
+            {/* Button to remove the book from the liked list */}
             <button className="buy-link" onClick={handleRemoveClick}>
               Remove from list
             </button>
@@ -221,4 +243,4 @@ const Liked: React.FC = () => {
   );
 };
 
-export default Liked;
+export default Liked; // Export the Liked component so it can be used elsewhere.

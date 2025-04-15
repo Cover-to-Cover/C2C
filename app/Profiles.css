@@ -1,66 +1,78 @@
 /* Container styling for the page */
+/* Sets padding around the container and applies a sans-serif font family for the entire page */
 .profiles-container {
-    padding: 1rem;
-    font-family: sans-serif;
-  }
-  
-  /* Profile section layout */
-  .profile-content {
-    margin-top: 1rem;
-  }
-  
-  /* Headings */
-  h1, h2 {
-    margin-bottom: 0.5rem;
-  }
-  
-  /* Buttons: matching style for Logout & Change Password */
-  .logout-button,
-  .change-password-button {
-    background-color: #f44336; /* red background */
-    color: white;
-    padding: 0.5rem 1rem;
-    border: 2px solid black;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: transform 0.2s;
-    cursor: pointer;
-    margin-right: 1rem;
-    margin-top: 0.5rem;
-  }
-  
-  /* Hover effect */
-  .logout-button:hover,
-  .change-password-button:hover {
-    transform: scale(1.05);
-  }
-  
-  /* Form styling for "Change Password" */
-  .password-form {
-    margin-top: 1rem;
-    max-width: 300px; /* optional, so form doesn't stretch too wide */
-  }
-  
-  .form-group {
-    margin-bottom: 1rem;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 0.3rem;
-    font-weight: bold;
-  }
-  
-  .form-group input {
-    width: 100%;
-    padding: 0.4rem;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  /* Password status message */
-  .password-message {
-    margin-top: 0.5rem;
-    font-weight: bold;
-  }
-  
+  padding: 1rem;           /* Adds 1rem of padding around the container */
+  font-family: sans-serif;  /* Uses a generic sans-serif font for better readability */
+}
+
+/* Profile section layout */
+/* Adds a top margin to space out the profile content from the top of the container */
+.profile-content {
+  margin-top: 1rem;        /* Creates space above the profile section */
+}
+
+/* Headings */
+/* Applies a consistent bottom margin to h1 and h2 elements for spacing */
+h1, h2 {
+  margin-bottom: 0.5rem;   /* Adds a small gap below headings */
+}
+
+/* Buttons: matching style for Logout & Change Password */
+/* Applies a shared set of styles to both logout and change password buttons */
+.logout-button,
+.change-password-button {
+  background-color: #f44336; /* Sets a red background color for high visibility */
+  color: white;              /* Ensures the button text is white for contrast */
+  padding: 0.5rem 1rem;       /* Vertical and horizontal padding for a clickable button */
+  border: 2px solid black;   /* Adds a solid black border to the button */
+  border-radius: 5px;        /* Rounds the corners of the button */
+  font-weight: bold;         /* Makes the text bold to emphasize the button label */
+  transition: transform 0.2s;/* Smooth transition for scaling when hovering */
+  cursor: pointer;           /* Changes the cursor to indicate the button is clickable */
+  margin-right: 1rem;        /* Adds right margin to separate buttons or other elements */
+  margin-top: 0.5rem;        /* Adds top margin for spacing from previous elements */
+}
+
+/* Hover effect */
+/* Creates an interactive scaling effect when hovering over logout or change password buttons */
+.logout-button:hover,
+.change-password-button:hover {
+  transform: scale(1.05);    /* Scales the button slightly larger (105% of original size) on hover */
+}
+
+/* Form styling for "Change Password" */
+/* Adds spacing above the password form and limits its maximum width to prevent overly wide forms */
+.password-form {
+  margin-top: 1rem;          /* Adds vertical spacing above the form */
+  max-width: 300px;          /* Constrains the form's maximum width to 300px */
+}
+
+/* Groups within the form */
+/* Provides consistent spacing between each form input group */
+.form-group {
+  margin-bottom: 1rem;       /* Adds space between individual form groups */
+}
+
+/* Label styling inside form groups */
+/* Ensures each label is displayed on its own line with proper spacing and emphasis */
+.form-group label {
+  display: block;           /* Forces the label to take up the full width of the container */
+  margin-bottom: 0.3rem;      /* Adds a small gap below the label */
+  font-weight: bold;        /* Bolds the label for better legibility */
+}
+
+/* Input field styling inside form groups */
+/* Defines the appearance of input fields to be consistent and user-friendly */
+.form-group input {
+  width: 100%;              /* Input fields take the full width of the form group */
+  padding: 0.4rem;          /* Provides padding inside the input for comfortable text entry */
+  border: 2px solid #ccc;   /* Uses a light grey border for input fields */
+  border-radius: 5px;       /* Rounds the corners of the input fields */
+}
+
+/* Password status message */
+/* Styles the message that displays feedback about password changes */
+.password-message {
+  margin-top: 0.5rem;       /* Adds a small gap above the message */
+  font-weight: bold;        /* Bolds the message to draw user attention */
+}

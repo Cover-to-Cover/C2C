@@ -4,129 +4,134 @@
 
 /* Main wrapper for the liked page content */
 .liked-container {
-  display: flex;                     /* Horizontal layout */
-  flex: 1;
-  overflow: hidden;                 /* Prevent scrollbars on main container */
-  height: calc(100vh - 120px);      /* Fills screen minus header/footer height */
-  box-sizing: border-box;
+  display: flex;                     /* Use flexbox for horizontal layout of child panels */
+  flex: 1;                           /* Let the container fill available space */
+  overflow: hidden;                  /* Hide overflow to prevent unwanted scrollbars */
+  height: calc(100vh - 120px);         /* Set height to full viewport minus header/footer height */
+  box-sizing: border-box;            /* Include padding and border in the element's total width and height */
 }
 
 /* Left panel for the liked books table */
 .table-container {
-  flex: 1;
-  max-width: 40%;                   /* Takes up 40% of horizontal space */
-  overflow-y: auto;                 /* Makes table scrollable */
-  margin-right: 1rem;              /* Space between table and details */
-  box-sizing: border-box;
+  flex: 1;                           /* Take up equal available flex space */
+  max-width: 40%;                    /* Limit width to 40% of the horizontal area */
+  overflow-y: auto;                  /* Enable vertical scrolling if content overflows */
+  margin-right: 1rem;                /* Add space between the table panel and details panel */
+  box-sizing: border-box;            /* Ensure padding and border are included in the element's size */
 }
 
 /* Right panel for book details */
 .details-container {
-  flex: 1;
-  overflow-y: auto;                 /* Makes book info scrollable */
-  padding: 2rem 2rem 2.5rem 2rem;   /* Top, Right, Bottom, Left */
-  box-sizing: border-box;
+  flex: 1;                           /* Take up remaining space equally with table container */
+  overflow-y: auto;                  /* Enable vertical scrolling for long content */
+  padding: 2rem 2rem 2.5rem 2rem;     /* Apply padding: top, right, bottom, left */
+  box-sizing: border-box;            /* Include padding/border in the element's total size */
 }
 
 /* --------------------------- */
 /* Custom Scrollbars (Webkit)  */
 /* --------------------------- */
 
-/* Scrollbar width for both table and detail panel */
+/* Set scrollbar width for both the table and details panels */
 .table-container::-webkit-scrollbar,
 .details-container::-webkit-scrollbar {
-  width: 8px;
+  width: 8px;                        /* Define a slim scrollbar width */
 }
 
-/* Scrollbar track color */
+/* Style the scrollbar track for the table and details panels */
 .table-container::-webkit-scrollbar-track,
 .details-container::-webkit-scrollbar-track {
-  background: #f44336;              /* Matches red theme */
+  background: #f44336;               /* Use red to match the theme for the scrollbar track */
 }
 
-/* Scrollbar thumb styling */
+/* Style the scrollbar thumb (the draggable part) */
 .table-container::-webkit-scrollbar-thumb,
 .details-container::-webkit-scrollbar-thumb {
-  background-color: #333;           /* Dark grey thumb */
-  border-radius: 4px;
-  border: 1px solid #333;
+  background-color: #333;            /* Dark grey thumb color for contrast */
+  border-radius: 4px;                /* Rounded corners for smoother appearance */
+  border: 1px solid #333;            /* A matching border to emphasize the thumb */
 }
 
-/* Scrollbar thumb hover effect */
+/* Hover effect for the scrollbar thumb */
 .table-container::-webkit-scrollbar-thumb:hover,
 .details-container::-webkit-scrollbar-thumb:hover {
-  background-color: #f1f1f1;        /* Lighter on hover */
+  background-color: #f1f1f1;         /* Lighten the thumb when hovered for interactivity */
 }
 
 /* --------------------------- */
 /* Table Styling               */
 /* --------------------------- */
 
+/* Basic table styles */
 table {
-  width: 100%;
-  border-collapse: collapse;        /* Removes gaps between borders */
-  font-family: inherit;
+  width: 100%;                       /* Table spans full width of its container */
+  border-collapse: collapse;         /* Merge cell borders into a single border */
+  font-family: inherit;              /* Inherit the font family from its parent */
 }
 
+/* Table headers and cells styling */
 th,
 td {
-  border: 2px solid black;
-  padding: 12px 16px;
-  text-align: left;
-  color: white;
+  border: 2px solid black;           /* Solid black border around each cell */
+  padding: 12px 16px;                /* Padding inside cells for spacing */
+  text-align: left;                  /* Left-align text within cells */
+  color: white;                      /* White text for high contrast against red background */
 }
 
 /* Header row style */
 th {
-  background-color: #f44336;
-  font-weight: bold;
+  background-color: #f44336;         /* Red background for header cells */
+  font-weight: bold;                 /* Bold text to highlight the header */
 }
 
-/* Row styling */
+/* Styling for each table row */
 tr {
-  background-color: #f44336;
-  transition: background-color 0.2s ease-in-out;
+  background-color: #f44336;         /* Red background for each row */
+  transition: background-color 0.2s ease-in-out;  /* Smooth transition effect for background on hover */
 }
 
-/* Row hover effect */
+/* Hover effect for table rows */
 tr:hover {
-  background-color: #d32f2f;
-  cursor: pointer;
+  background-color: #d32f2f;         /* Darker red when hovered to indicate interactivity */
+  cursor: pointer;                   /* Change cursor to pointer to signal clickable rows */
 }
 
 /* --------------------------- */
 /* Book Cover Image Styling    */
 /* --------------------------- */
 
+/* Style for book cover images */
 .book-cover {
-  max-width: 300px;
-  margin-bottom: 1rem;
-  border: 2px solid black;
+  max-width: 300px;                  /* Limit maximum width to 300px */
+  margin-bottom: 1rem;               /* Margin below the image to separate from subsequent content */
+  border: 2px solid black;           /* Black border around the image for definition */
 }
 
 /* --------------------------- */
 /* Buttons (Compare / Remove)  */
 /* --------------------------- */
 
+/* Container for buttons, ensuring spacing between them */
 .buy-buttons {
-  display: flex;
-  gap: 1rem;                        /* Space between buttons */
-  margin-top: 1rem;
+  display: flex;                     /* Use flexbox for layout */
+  gap: 1rem;                        /* Gap between buttons */
+  margin-top: 1rem;                 /* Margin above the button row */
 }
 
+/* Styling for link-style buttons used for comparing offers and removing items */
 .buy-link {
-  background-color: #f44336;        /* Red background */
-  color: white;
-  padding: 0.5rem 1rem;
-  text-decoration: none;
-  border: 2px solid black;
-  border-radius: 5px;
-  font-weight: bold;
-  transition: transform 0.2s;       /* Slight animation on hover */
+  background-color: #f44336;        /* Red background consistent with theme */
+  color: white;                     /* White text for contrast */
+  padding: 0.5rem 1rem;              /* Padding inside the button for a clickable area */
+  text-decoration: none;            /* Remove underline from the link */
+  border: 2px solid black;          /* Solid black border for definition */
+  border-radius: 5px;               /* Rounded corners for a softer look */
+  font-weight: bold;                /* Bold text for emphasis */
+  transition: transform 0.2s;       /* Smooth scaling animation on hover */
 }
 
-/* Button hover effect */
+/* Hover effect for the buttons */
 .buy-link:hover {
-  transform: scale(1.05);           /* Grows slightly */
-  cursor: pointer;
+  transform: scale(1.05);           /* Slightly enlarge the button on hover */
+  cursor: pointer;                  /* Change cursor to pointer to indicate clickability */
 }

@@ -1,64 +1,80 @@
-/* src/css/leftnav.css */
+/* app/components/leftnav.css */
+
+/* 
+  Base styles for the left navigation panel.
+  This panel is fixed to the left side of the viewport and can be either expanded or collapsed.
+*/
+
+/* Container for the left navigation panel */
 .left-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  background-color: #333;
-  color: white;
-  overflow: hidden;
-  transition: width 0.3s ease;
-  z-index: 1000;
-  border-right: 1px solid black;
+  position: fixed;              /* Fixes the nav to a specific position on the screen */
+  top: 0;                       /* Aligns the nav with the top of the viewport */
+  left: 0;                      /* Aligns the nav with the left of the viewport */
+  height: 100%;                 /* Occupies the full height of the viewport */
+  background-color: #333;       /* Dark background color for contrast */
+  color: white;                 /* White text color for readability */
+  overflow: hidden;             /* Hides any content that overflows the container */
+  transition: width 0.3s ease;  /* Smooth transition effect when changing width */
+  z-index: 1000;                /* Places the nav above other elements on the page */
+  border-right: 1px solid black;/* Adds a border to the right side for separation */
 }
 
+/* Style when the navigation panel is expanded */
 .left-nav.expanded {
-  width: 200px;
+  width: 200px;  /* Sets the width to 200px when expanded */
 }
 
+/* Style when the navigation panel is collapsed */
 .left-nav.collapsed {
-  width: 60px;
+  width: 60px;   /* Sets the width to 60px when collapsed */
 }
 
+/* Styling for the hamburger button that toggles the nav */
 .hamburger {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 2rem;
-  padding: 10px;
-  cursor: pointer;
-  width: 100%;
-  text-align: left;
+  background: none;      /* Removes background styling */
+  border: none;          /* Removes any borders */
+  color: white;          /* White text color for consistency */
+  font-size: 2rem;       /* Enlarges the hamburger icon for easier clicking */
+  padding: 10px;         /* Adds padding for a larger clickable area */
+  cursor: pointer;       /* Changes the cursor to a pointer to indicate a clickable element */
+  width: 100%;           /* Ensures the button spans the full width of the navigation panel */
+  text-align: left;      /* Aligns the button content to the left */
 }
 
+/* Styles for the unordered list inside the nav element */
 .left-nav nav ul {
-  list-style: none;
-  padding: 0;
-  margin: 20px 0 0;
+  list-style: none;         /* Removes the default bullet points from the list */
+  padding: 0;               /* Removes default padding */
+  margin: 20px 0 0;         /* Adds top margin to create spacing, while removing bottom and side margins */
 }
 
+/* List items within the navigation list */
 .left-nav nav ul li {
-  margin: 0;
+  margin: 0;  /* Removes any margin between the list items */
 }
 
+/* Styling for individual navigation links */
 .left-nav nav ul li a {
-  display: flex;
-  align-items: center;
-  color: white;
-  text-decoration: none;
-  padding: 10px;
-  transition: background 0.2s;
+  display: flex;               /* Uses flexbox to align items */
+  align-items: center;         /* Centers items vertically within the link */
+  color: white;                /* Maintains white text color for consistency */
+  text-decoration: none;       /* Removes the underline from the links */
+  padding: 10px;               /* Adds padding for a larger clickable area */
+  transition: background 0.2s; /* Smooth transition effect for background changes on hover */
 }
 
+/* Hover effect for navigation links */
 .left-nav nav ul li a:hover {
-  background-color: #444;
+  background-color: #444;  /* Slightly lighter background on hover to indicate interactivity */
 }
 
+/* Styling for the icon inside each link */
 .icon {
-  font-size: 2rem;
-  margin-right: 10px;
+  font-size: 2rem;    /* Increases the icon size */
+  margin-right: 10px; /* Adds space between the icon and any adjacent label */
 }
 
+/* Styling for the text label displayed with each icon (when expanded) */
 .label {
-  font-size: 1rem;
+  font-size: 1rem;    /* Sets the font size for the label text */
 }
