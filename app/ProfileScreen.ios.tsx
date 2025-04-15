@@ -37,7 +37,7 @@ export default function ProfileScreen() {
     if (error) {
       console.error('Error signing out:', error.message);
     }
-    router.push('/login');
+    router.push('/LoginScreen');
   };
 
   const handleChangePassword = async () => {
