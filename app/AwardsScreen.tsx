@@ -41,7 +41,6 @@ export default function Awards() {
       if (error) {
         console.error('Error fetching user awards:', error.message);
       } else if (data) {
-        console.log('user_awards query result:', data);
         // Map records to extract the joined award data
         const awardsArray: Award[] = data
           .map((record: any) => record.award)
