@@ -14,6 +14,9 @@ import {
   Animated,
   Dimensions,
   PanResponder,
+  ActionSheetIOS,
+  Share,
+  Platform,
 } from 'react-native'; // Import various React Native components and APIs for UI, animations, gestures, etc.
 import { supabase } from '../lib/supabaseClient'; // Import the Supabase client for backend operations.
 import { useRouter } from 'expo-router'; // Import the router hook to handle navigation.
@@ -28,6 +31,7 @@ interface LikedBook {
   description?: string;         // Optional extended description of the book.
   openLibraryLink?: string;     // Optional link to the Open Library page for the book.
   isbn13?: string;              // Optional ISBN-13 for further details or comparison offers.
+  isbn10?: string;
 }
 
 export default function LikedScreen() {
@@ -100,44 +104,40 @@ export default function LikedScreen() {
 
   // When a row is clicked in the list, fetch extended details from Open Library and slide in the details panel.
   const handleRowClick = async (book: LikedBook) => {
-    setSelectedBook(null); // Clear any previous selection while loading new details.
+    setSelectedBook(null);
     try {
-      // Fetch core work details from Open Library using the book's ISBN.
       const workRes = await fetch(`https://openlibrary.org/works/${book.isbn}.json`);
       const workData = await workRes.json();
-      let isbn13 = '';
-      // Try to fetch the ISBN-13 by querying the editions endpoint.
-      try {
-        const editionsRes = await fetch(`https://openlibrary.org/works/${book.isbn}/editions.json?limit=1`);
-        const editionsData = await editionsRes.json();
-        const edition = editionsData.entries?.[0];
-        const isbn13Candidate = edition?.isbn_13?.[0];
-        if (isbn13Candidate) isbn13 = isbn13Candidate;
-      } catch (err) {
-        console.warn('Could not fetch ISBN-13 from editions.');
-      }
-      // Construct an extended book object with additional details.
+  
+      // Grab up to 20 editions so we have a better shot at finding an ISBN‑10
+      const editionsRes = await fetch(`https://openlibrary.org/works/${book.isbn}/editions.json?limit=20`);
+      const { entries } = await editionsRes.json();
+  
+      // Find the first edition that has an isbn_10 array
+      const bestEdition = entries.find(e => Array.isArray(e.isbn_10) && e.isbn_10.length > 0) || entries[0] || {};
+      const isbn10 = Array.isArray(bestEdition.isbn_10) ? bestEdition.isbn_10[0] : '';
+      const isbn13 = Array.isArray(bestEdition.isbn_13) ? bestEdition.isbn_13[0] : '';
+  
       const extendedBook: LikedBook = {
         ...book,
         description:
           typeof workData.description === 'string'
             ? workData.description
             : workData.description?.value || 'No description available.',
-        cover_id: workData.covers ? workData.covers[0] : undefined,
+        cover_id: workData.covers?.[0],
         openLibraryLink: `https://openlibrary.org/works/${book.isbn}`,
+        isbn10,
         isbn13,
       };
-      // Update the selectedBook state to display details.
+  
       setSelectedBook(extendedBook);
-      // Animate the slide in effect from the right (screenWidth) to zero.
       Animated.timing(slideAnim, {
-        toValue: 0, // Slide to position 0 (fully in view).
-        duration: 300, // Animation lasts 300ms.
+        toValue: 0,
+        duration: 300,
         useNativeDriver: true,
       }).start();
     } catch (err) {
       console.error('Error fetching OpenLibrary data:', err);
-      // If there's an error, set selectedBook with a fallback description.
       setSelectedBook({ ...book, description: 'No description available.' });
     }
   };
@@ -183,6 +183,24 @@ export default function LikedScreen() {
       ]
     );
   };
+
+  const handleShare = () => {
+    if (!selectedBook) return;
+  
+    const { isbn10 } = selectedBook;
+    if (!isbn10) {
+      Alert.alert('Unable to find ISBN‑10 for sharing.');
+      return;
+    }
+  
+    const url = `https://www.amazon.com/dp/${isbn10}`;
+    const message = `I loved the cover of this book!\n${url}`;
+  
+    Share.share(
+      { message },
+      { dialogTitle: 'Share this book' }
+    ).catch(err => console.warn('Share error:', err));
+  };   
 
   // Open an external URL for comparing offers if ISBN-13 is available.
   const handleCompareOffers = () => {
@@ -250,11 +268,16 @@ export default function LikedScreen() {
         <Text style={styles.detailDescription}>{selectedBook.description}</Text>
         {/* Buttons for external link and removal */}
         <View style={styles.buttonRow}>
+          <TouchableOpacity style={styles.linkButton} onPress={handleShare}>
+            <Text style={styles.linkButtonText}>Share</Text>
+          </TouchableOpacity>
+
           {selectedBook.isbn13 && (
             <TouchableOpacity style={styles.linkButton} onPress={handleCompareOffers}>
               <Text style={styles.linkButtonText}>Compare Offers</Text>
             </TouchableOpacity>
           )}
+
           <TouchableOpacity style={styles.linkButton} onPress={handleRemoveClick}>
             <Text style={styles.linkButtonText}>Remove from list</Text>
           </TouchableOpacity>
@@ -267,23 +290,23 @@ export default function LikedScreen() {
 // Define styles for the component.
 const styles = StyleSheet.create({
   listContainer: {
-    flex: 1,                     // Fill the entire screen.
+    flex: 1,
     padding: 10,
-    backgroundColor: '#f0f4f7',   // Light background color.
+    backgroundColor: '#f0f4f7',
   },
   tableContainer: {
     padding: 10,
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#f44336',   // Red background for header.
+    backgroundColor: '#f44336',
     borderWidth: 2,
     borderColor: 'black',
     paddingVertical: 8,
   },
   tableRow: {
     flexDirection: 'row',
-    backgroundColor: '#f44336',   // Red background for rows.
+    backgroundColor: '#f44336',
     borderWidth: 2,
     borderColor: 'black',
     paddingVertical: 8,
@@ -292,15 +315,15 @@ const styles = StyleSheet.create({
   tableCell: {
     flex: 1,
     paddingHorizontal: 8,
-    color: 'white',              // White text for contrast.
+    color: 'white',
     fontSize: 14,
   },
   headerCell: {
-    fontWeight: 'bold',          // Bold header text.
+    fontWeight: 'bold',
   },
   detailsContainer: {
     flex: 1,
-    backgroundColor: '#f0f4f7',   // Light background.
+    backgroundColor: '#f0f4f7',
     paddingTop: 40,
   },
   backButton: {
@@ -346,7 +369,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   linkButton: {
-    backgroundColor: '#f44336',  // Red button background.
+    backgroundColor: '#f44336',
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderWidth: 2,
