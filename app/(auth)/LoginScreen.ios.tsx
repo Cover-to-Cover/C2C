@@ -53,6 +53,11 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
+      <Image
+        source={require('../../assets/logo.png')}
+        style={styles.logo}
+      />
+
       <Text style={styles.header}>Login</Text>
       {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
 
@@ -106,6 +111,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
+  },
+  logo: {
+    width: 200,
+    height: 250,
+    marginBottom: 20,        
+    resizeMode: 'contain',
   },
   header: {
     fontSize: 28,
