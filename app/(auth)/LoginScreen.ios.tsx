@@ -109,13 +109,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f4f4f4',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     paddingHorizontal: 20,
   },
   logo: {
-    width: 200,
-    height: 250,
-    marginBottom: 20,        
+    width: 300,
+    height: 350,
+    marginBottom: 10,   
+    marginTop: 75,
     resizeMode: 'contain',
   },
   header: {
