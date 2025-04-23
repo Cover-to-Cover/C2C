@@ -4,6 +4,8 @@ import { supabase } from '../lib/supabaseClient'; // Import the Supabase client 
 import { useRouter } from 'expo-router'; // Import the Expo Router hook for navigating between screens.
 import './Profiles.css'; // Import CSS file for component styling.
 import { navigate } from 'expo-router/build/global-state/routing'; // Import navigate (if needed) for navigation global state.
+import * as XLSX from 'xlsx'; // Import xlsx for Excel file creation
+import { saveAs } from 'file-saver'; // Import file-saver to download the file
 
 // Define an interface representing a user profile with at least 'id' and 'email' fields.
 // Additional profile fields can be added as needed.
@@ -11,6 +13,17 @@ interface UserProfile {
   id: string;
   email: string;
   // add additional profile fields as needed
+}
+
+// Define interface for  theliked books
+interface LikedBook {
+  isbn: string;
+  title: string;
+  author: string;
+  cover_id?: number;
+  description?: string;
+  openLibraryLink?: string;
+  isbn13?: string;
 }
 
 // Define the Profiles functional component using React.FC.
@@ -23,6 +36,8 @@ const Profiles: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   // State to store and display messages related to password change actions.
   const [passwordMessage, setPasswordMessage] = useState('');
+  // State to track export
+  const [exporting, setExporting] = useState(false);
   // Get the router object for navigating between screens.
   const router = useRouter();
 
@@ -46,6 +61,57 @@ const Profiles: React.FC = () => {
     // Call the asynchronous function to fetch the profile.
     fetchProfile();
   }, [navigate]); // The dependency array includes 'navigate', ensuring the effect runs on changes (though this might be redundant).
+
+  // Function to export liked books to Excel
+  const exportLikedBooks = async () => {
+    if (!profile?.id) return;
+    
+    try {
+      setExporting(true);
+      
+      // Fetch liked books from Supabase
+      const { data, error } = await supabase
+        .from('user_books')
+        .select('isbn, title, author')
+        .eq('user_id', profile.id)
+        .eq('liked', true);
+      
+      if (error) {
+        console.error('Error fetching liked books:', error.message);
+        alert('Error fetching liked books. Please try again.');
+        setExporting(false);
+        return;
+      }
+      
+      if (!data || data.length === 0) {
+        alert('You have no liked books to export.');
+        setExporting(false);
+        return;
+      }
+      
+      // Create worksheet with data
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      
+      // Create workbook and add the worksheet
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Liked Books');
+      
+      // Generate Excel file as a binary string
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      
+      // Convert buffer to Blob
+      const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      
+      // Save file using FileSaver
+      saveAs(blob, `liked-books-${new Date().toISOString().split('T')[0]}.xlsx`);
+      
+    } catch (err) {
+      console.error('Error exporting books:', err);
+      alert('Error exporting books. Please try again.');
+    } finally {
+      setExporting(false);
+    }
+  };
 
   // Function to handle user logout.
   const handleLogout = async () => {
@@ -126,6 +192,15 @@ const Profiles: React.FC = () => {
             <button type="submit" className="change-password-button">
               Change Password
             </button>
+
+          <button 
+            className="export-button" 
+            onClick={exportLikedBooks}
+            disabled={exporting}
+          >
+            {exporting ? 'Exporting...' : 'Export'}
+          </button>
+
           </form>
 
           {/* Display a message if there is any feedback from the password change action */}
