@@ -40,34 +40,6 @@ h1, h2 {
   transform: scale(1.05);    /* Scales the button slightly larger (105% of original size) on hover */
 }
 
-/* Export Button styling */
-/* Creates a styled button for exporting liked books to Excel */
-.export-button {
-  background-color: #2196F3; /* Blue background color to distinguish from other buttons */
-  color: white;              /* White text for high contrast */
-  padding: 0.5rem 1rem;      /* Consistent padding with other buttons */
-  border: 2px solid black;   /* Matching border style */
-  border-radius: 5px;        /* Rounded corners */
-  font-weight: bold;         /* Bold text for emphasis */
-  transition: transform 0.2s; /* Smooth hover effect */
-  cursor: pointer;           /* Clickable cursor */
-  margin-top: 1.5rem;
-  margin-bottom: 1.5rem;     /* Space between export button and other elements */
-  display: block;            /* Make button a block element */
-}
-
-/* Hover effect for export button */
-.export-button:hover {
-  transform: scale(1.05);    /* Scale effect on hover to match other buttons */
-}
-
-/* Disabled state for export button */
-.export-button:disabled {
-  background-color: #cccccc; /* Grey background when disabled */
-  cursor: not-allowed;       /* Change cursor to indicate button is disabled */
-  transform: none;           /* No transform effect when disabled */
-}
-
 /* Form styling for "Change Password" */
 /* Adds spacing above the password form and limits its maximum width to prevent overly wide forms */
 .password-form {
