@@ -27,6 +27,7 @@ interface LikedBook {
   isbn: string;
   title: string;
   author: string;
+  created_at?: string;
   cover_id?: number;            // Optional cover ID to display the book cover.
   description?: string;         // Optional extended description of the book.
   openLibraryLink?: string;     // Optional link to the Open Library page for the book.
@@ -41,10 +42,8 @@ export default function LikedScreen() {
   const [likedBooks, setLikedBooks] = useState<LikedBook[]>([]);
   // State to store the currently selected book's extended details.
   const [selectedBook, setSelectedBook] = useState<LikedBook | null>(null);
-
   // Hook to manage navigation.
   const router = useRouter();
-
   // Set up an Animated value for the slide-in effect.
   // Starts off the screen to the right by setting the initial value to the window width.
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current;
@@ -89,9 +88,10 @@ export default function LikedScreen() {
     const fetchBooks = async () => {
       const { data, error } = await supabase
         .from('user_books')
-        .select('isbn, title, author')
+        .select('isbn, title, author, created_at')
         .eq('user_id', userId)
-        .eq('liked', true);
+        .eq('liked', true)
+        .order('created_at', { ascending: false });
       if (error) {
         console.error('Error fetching liked books:', error.message);
         return;
@@ -101,6 +101,35 @@ export default function LikedScreen() {
     };
     fetchBooks();
   }, [userId]);
+
+  // Quick-remove handler from the list
+  const handleQuickRemove = (book: LikedBook) => {
+    Alert.alert(
+      'Confirm Removal',
+      `Are you sure you want to remove this book from your list?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            const { error } = await supabase
+              .from('user_books')
+              .delete()
+              .eq('isbn', book.isbn)
+              .eq('user_id', userId);
+            if (error) {
+              console.error('Error deleting record:', error.message);
+              return;
+            }
+            setLikedBooks((prev) =>
+              prev.filter((b) => b.isbn !== book.isbn)
+            );
+          },
+        },
+      ]
+    );
+  };
 
   // When a row is clicked in the list, fetch extended details from Open Library and slide in the details panel.
   const handleRowClick = async (book: LikedBook) => {
@@ -214,27 +243,39 @@ export default function LikedScreen() {
     return (
       <View style={styles.listContainer}>
         <ScrollView contentContainerStyle={styles.tableContainer}>
-          {/* Table header for the list */}
           <View style={styles.tableHeader}>
             <Text style={[styles.tableCell, styles.headerCell]}>Title</Text>
             <Text style={[styles.tableCell, styles.headerCell]}>Author</Text>
+            <Text style={[styles.tableCell, styles.headerCell]}>Liked on</Text>
+            <View style={styles.removeHeader} />   {/* empty for alignment */}
           </View>
-          {/* If there are no liked books, display a message */}
+
           {likedBooks.length === 0 ? (
             <View style={styles.tableRow}>
               <Text style={styles.tableCell}>No liked books found.</Text>
             </View>
           ) : (
-            // Render each liked book as a row in the table.
             likedBooks.map((book) => (
-              <TouchableOpacity
-                key={book.isbn}
-                style={styles.tableRow}
-                onPress={() => handleRowClick(book)}
-              >
-                <Text style={styles.tableCell}>{book.title}</Text>
-                <Text style={styles.tableCell}>{book.author}</Text>
-              </TouchableOpacity>
+              <View key={book.isbn} style={styles.tableRow}>
+                <TouchableOpacity
+                  style={styles.mainCell}
+                  onPress={() => handleRowClick(book)}
+                >
+                  <Text style={styles.tableCell}>{book.title}</Text>
+                  <Text style={styles.tableCell}>{book.author}</Text>
+                  <Text style={styles.tableCell}>
+                    {book.created_at
+                      ? new Date(book.created_at).toLocaleDateString()
+                      : '-'}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.removeButtonCell}
+                  onPress={() => handleQuickRemove(book)}
+                >
+                  <FontAwesome name="times" size={18} color="white" />
+                </TouchableOpacity>
+              </View>
             ))
           )}
         </ScrollView>
@@ -291,11 +332,11 @@ export default function LikedScreen() {
 const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
-    padding: 10,
+    padding: 0,
     backgroundColor: '#f0f4f7',
   },
   tableContainer: {
-    padding: 10,
+    padding: 0,
   },
   tableHeader: {
     flexDirection: 'row',
@@ -310,7 +351,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'black',
     paddingVertical: 8,
-    marginTop: 4,
+  },
+  mainCell: {
+    flex: 1,
+    flexDirection: 'row',
   },
   tableCell: {
     flex: 1,
@@ -319,6 +363,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   headerCell: {
+    fontWeight: 'bold',
+  },
+  removeHeader: {
+    width: 40,
+    textAlign: 'center',
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  removeButtonCell: {
+    width: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  removeButtonText: {
+    color: 'white',
+    fontSize: 16,
     fontWeight: 'bold',
   },
   detailsContainer: {

@@ -1,12 +1,24 @@
-// app/dashboard.tsx
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from 'react-native';
+// app/DashboardScreen.ios.tsx
+import React, { useEffect, useState, useRef } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  ActivityIndicator,
+  Animated,
+  PanResponder,
+  Dimensions,
+} from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useRouter } from 'expo-router';
 import { supabase } from '../lib/supabaseClient';
 import { FontAwesome } from '@expo/vector-icons';
 
-// Define the Work interface for book data from Open Library.
+const SCREEN_WIDTH = Dimensions.get('window').width;
+
+// --- types & constants ---
 interface Work {
   key: string;
   title: string;
@@ -14,207 +26,268 @@ interface Work {
   authors: { name: string }[];
 }
 
-// Map human-readable genre names to API slugs.
-const genreMap: { [key: string]: string } = {
-  "Mystery": "mystery",
-  "Science Fiction": "science_fiction",
-  "Fantasy": "fantasy",
-  "Romance": "romance",
-  "Horror": "horror",
-  "Thriller": "thriller",
-  "Historical Fiction": "historical_fiction",
-  "Biography": "biography",
-  "Memoir": "memoir",
-  "Self-Help": "self_help",
-  "Poetry": "poetry",
-  "Drama": "drama",
-  "Adventure": "adventure",
-  "Crime Fiction": "crime_fiction",
-  "Dystopian": "dystopian",
-  "Paranormal": "paranormal",
-  "Magical Realism": "magical_realism",
-  "Classic Literature": "classic_literature",
-  "Children's Literature": "children",
-  "Young Adult Fiction": "young_adult",
-  "Satire": "satire",
-  "Philosophical Fiction": "philosophical_fiction",
-  "Literary Fiction": "literary_fiction",
-  "Western": "western",
-  "Detective Fiction": "detective",
-  "War Fiction": "war_fiction",
-  "Gothic Fiction": "gothic",
-  "Political Fiction": "political_fiction",
-  "Cyberpunk": "cyberpunk",
-  "Coming-of-Age Fiction": "coming_of_age"
+const genreMap: Record<string, string> = {
+  Mystery: 'mystery',
+  'Science Fiction': 'science_fiction',
+  Fantasy: 'fantasy',
+  Romance: 'romance',
+  Horror: 'horror',
+  Thriller: 'thriller',
+  'Historical Fiction': 'historical_fiction',
+  Biography: 'biography',
+  Memoir: 'memoir',
+  'Self-Help': 'self_help',
+  Poetry: 'poetry',
+  Drama: 'drama',
+  Adventure: 'adventure',
+  'Crime Fiction': 'crime_fiction',
+  Dystopian: 'dystopian',
+  Paranormal: 'paranormal',
+  'Magical Realism': 'magical_realism',
+  'Classic Literature': 'classic_literature',
+  "Children's Literature": 'children',
+  'Young Adult Fiction': 'young_adult',
+  Satire: 'satire',
+  'Philosophical Fiction': 'philosophical_fiction',
+  'Literary Fiction': 'literary_fiction',
+  Western: 'western',
+  'Detective Fiction': 'detective',
+  'War Fiction': 'war_fiction',
+  'Gothic Fiction': 'gothic',
+  'Political Fiction': 'political_fiction',
+  Cyberpunk: 'cyberpunk',
+  'Coming-of-Age Fiction': 'coming_of_age',
 };
 
-export default function Dashboard() {
+export default function DashboardScreen() {
   const [userEmail, setUserEmail] = useState('');
   const [userId, setUserId] = useState('');
   const [currentWork, setCurrentWork] = useState<Work | null>(null);
   const [bookDetails, setBookDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [showHeartAnim, setShowHeartAnim] = useState(false);
-  const [showXAnim, setShowXAnim] = useState(false);
-  const router = useRouter();
 
-  // For the custom dropdown:
+  // dropdown state
   const [open, setOpen] = useState(false);
-  const [selectedGenre, setSelectedGenre] = useState("Science Fiction");
+  const [selectedGenre, setSelectedGenre] = useState('Science Fiction');
   const [items, setItems] = useState(
-    Object.keys(genreMap).map((genre) => ({ label: genre, value: genre }))
+    Object.keys(genreMap).map((g) => ({ label: g, value: g }))
   );
 
-  // Check user authentication on mount.
+  const router = useRouter();
+
+  // fetch books user has already seen
+  const getUserBookISBNs = async (): Promise<string[]> => {
+    if (!userId) return [];
+    const { data, error } = await supabase
+      .from('user_books')
+      .select('isbn')
+      .eq('user_id', userId);
+    if (error) {
+      console.error(error.message);
+      return [];
+    }
+    return data.map((r: any) => r.isbn);
+  };
+
+  // like handler
+  const handleHeartClick = async () => {
+    if (isLoading || !currentWork) return;
+    const isbn = currentWork.key.replace('/works/', '');
+    const seen = await getUserBookISBNs();
+    if (!seen.includes(isbn)) {
+      await supabase.from('user_books').insert([
+        {
+          isbn,
+          title: currentWork.title,
+          author: currentWork.authors?.[0]?.name || 'Unknown',
+          liked: true,
+          user_id: userId,
+        },
+      ]);
+    }
+    pickRandomWork();
+  };
+
+  // dislike handler
+  const handleXClick = async () => {
+    if (isLoading || !currentWork) return;
+    const isbn = currentWork.key.replace('/works/', '');
+    const seen = await getUserBookISBNs();
+    if (!seen.includes(isbn)) {
+      await supabase.from('user_books').insert([
+        { isbn, liked: false, user_id: userId },
+      ]);
+    }
+    pickRandomWork();
+  };
+
+  // keep refs to latest handlers
+  const heartRef = useRef(handleHeartClick);
+  const xRef = useRef(handleXClick);
   useEffect(() => {
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+    heartRef.current = handleHeartClick;
+    xRef.current = handleXClick;
+  }, [handleHeartClick, handleXClick]);
+
+  // animation values
+  const pan = useRef(new Animated.Value(0)).current;
+  const fade = useRef(new Animated.Value(1)).current;
+  const swipeThreshold = 100;
+
+  // pan responder
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      // update horizontal position
+      onPanResponderMove: Animated.event(
+        [null, { dx: pan }],
+        { useNativeDriver: false }
+      ),
+      onPanResponderRelease: (_e, { dx }) => {
+        if (dx < -swipeThreshold) {
+          // swipe left → like: slide off to left + fade out
+          Animated.parallel([
+            Animated.timing(pan, {
+              toValue: -SCREEN_WIDTH,
+              duration: 200,
+              useNativeDriver: false,
+            }),
+            Animated.timing(fade, {
+              toValue: 0,
+              duration: 200,
+              useNativeDriver: false,
+            }),
+          ]).start(() => {
+            heartRef.current();
+            pan.setValue(0);
+            fade.setValue(1);
+          });
+        } else if (dx > swipeThreshold) {
+          // swipe right → dislike: slide off to right + fade out
+          Animated.parallel([
+            Animated.timing(pan, {
+              toValue: SCREEN_WIDTH,
+              duration: 200,
+              useNativeDriver: false,
+            }),
+            Animated.timing(fade, {
+              toValue: 0,
+              duration: 200,
+              useNativeDriver: false,
+            }),
+          ]).start(() => {
+            xRef.current();
+            pan.setValue(0);
+            fade.setValue(1);
+          });
+        } else {
+          // not far enough → spring back
+          Animated.spring(pan, {
+            toValue: 0,
+            bounciness: 10,
+            useNativeDriver: false,
+          }).start();
+        }
+      },
+    })
+  ).current;
+
+  // auth check
+  useEffect(() => {
+    (async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session?.user?.email && session.user.id) {
         setUserEmail(session.user.email);
         setUserId(session.user.id);
       } else {
         router.push('/LoginScreen');
       }
-    };
-    checkUser();
+    })();
   }, []);
 
-  // Fetch a new random work from the selected genre.
+  // fetch a new random work
   const pickRandomWork = async () => {
     setIsLoading(true);
     setBookDetails(null);
     setCurrentWork(null);
-    const existingISBNs = await getUserBookISBNs();
-    let foundNewBook = false;
+    const seen = await getUserBookISBNs();
+    let found = false;
 
-    for (let attempt = 1; attempt <= 15; attempt++) {
-      const subjectSlug = genreMap[selectedGenre] || selectedGenre.toLowerCase().replace(/\s+/g, '_');
+    for (let i = 0; i < 15; i++) {
       try {
-        const countResponse = await fetch(`https://openlibrary.org/subjects/${subjectSlug}.json?limit=1`);
-        const countData = await countResponse.json();
-        const totalWorks = countData.work_count;
-        if (totalWorks && totalWorks > 0) {
-          const randomOffset = Math.floor(Math.random() * totalWorks);
-          const response = await fetch(`https://openlibrary.org/subjects/${subjectSlug}.json?limit=1&offset=${randomOffset}`);
-          const data = await response.json();
-          if (data.works && data.works.length > 0) {
-            const filteredWorks = data.works.filter((work: any) => work.cover_id);
-            const potentialWork = filteredWorks[0];
-            if (potentialWork) {
-              const isbn = potentialWork.key.replace('/works/', '');
-              if (!existingISBNs.includes(isbn)) {
-                setCurrentWork(potentialWork);
-                foundNewBook = true;
-                break;
-              }
-            }
+        const slug =
+          genreMap[selectedGenre] ||
+          selectedGenre.toLowerCase().replace(/\s+/g, '_');
+        const cntRes = await fetch(
+          `https://openlibrary.org/subjects/${slug}.json?limit=1`
+        );
+        const { work_count } = await cntRes.json();
+        const offset = Math.floor(Math.random() * work_count);
+        const wkRes = await fetch(
+          `https://openlibrary.org/subjects/${slug}.json?limit=1&offset=${offset}`
+        );
+        const data = await wkRes.json();
+        const work = data.works?.find((w: any) => w.cover_id);
+        if (work) {
+          const isbn = work.key.replace('/works/', '');
+          if (!seen.includes(isbn)) {
+            setCurrentWork(work);
+            found = true;
+            break;
           }
         }
-      } catch (error) {
-        console.error(`Error on attempt ${attempt}:`, error);
+      } catch (e) {
+        console.error(e);
       }
     }
-    if (!foundNewBook) {
+
+    if (!found) {
       setBookDetails({ description: 'No more books available in this genre :(' });
     }
     setIsLoading(false);
   };
 
-  // Automatically fetch a new work when the selected genre changes.
+  // auto-fetch when genre changes
   useEffect(() => {
     pickRandomWork();
   }, [selectedGenre]);
 
-  // Fetch additional details for the current work.
+  // fetch details when we have a current work
   useEffect(() => {
-    const fetchBookDetails = async () => {
-      if (currentWork) {
-        try {
-          const response = await fetch(`https://openlibrary.org${currentWork.key}.json`);
-          const data = await response.json();
-          setBookDetails(data);
-        } catch (error) {
-          console.error('Error fetching book details:', error);
-        }
+    (async () => {
+      if (!currentWork) return;
+      try {
+        const res = await fetch(
+          `https://openlibrary.org${currentWork.key}.json`
+        );
+        setBookDetails(await res.json());
+      } catch (e) {
+        console.error(e);
       }
-    };
-    fetchBookDetails();
+    })();
   }, [currentWork]);
 
-  // Helper: Get user book ISBNs from Supabase.
-  const getUserBookISBNs = async (): Promise<string[]> => {
-    if (!userId) return []; // Avoid querying with an empty userId
-    const { data, error } = await supabase
-      .from('user_books')
-      .select('isbn')
-      .eq('user_id', userId);
-    if (error) {
-      console.error('Error fetching user books:', error.message);
-      return [];
-    }
-    return data.map((row: any) => row.isbn);
-  };
-
-  // Handle "heart" (like) button.
-  const handleHeartClick = async () => {
-    if (isLoading || !currentWork) return;
-    setShowHeartAnim(true);
-    setTimeout(() => setShowHeartAnim(false), 1000);
-    const isbnValue = currentWork.key.replace('/works/', '');
-    const title = currentWork.title;
-    const author = currentWork.authors?.[0]?.name || 'Unknown';
-    const exists = await getUserBookISBNs().then(isbns => isbns.includes(isbnValue));
-    if (!exists) {
-      const { error } = await supabase
-        .from('user_books')
-        .insert([{ isbn: isbnValue, title, author, liked: true, user_id: userId }]);
-      if (error) console.error('Error inserting record:', error.message);
-    }
-    await pickRandomWork();
-  };
-
-  // Handle "X" (dislike) button.
-  const handleXClick = async () => {
-    if (isLoading) return;
-    if (currentWork) {
-      setShowXAnim(true);
-      setTimeout(() => setShowXAnim(false), 1000);
-      const isbnValue = currentWork.key.replace('/works/', '');
-      const exists = await getUserBookISBNs().then(isbns => isbns.includes(isbnValue));
-      if (!exists) {
-        const { error } = await supabase
-          .from('user_books')
-          .insert([{ isbn: isbnValue, liked: false, user_id: userId }]);
-        if (error) console.error('Error inserting record:', error.message);
-      }
-    }
-    await pickRandomWork();
-  };
-
+  // build summary text
   let summaryText = 'No description available.';
-  if (bookDetails && bookDetails.description) {
-    if (typeof bookDetails.description === 'string') {
-      summaryText = bookDetails.description;
-    } else if (typeof bookDetails.description === 'object' && bookDetails.description.value) {
-      summaryText = bookDetails.description.value;
-    }
+  if (bookDetails?.description) {
+    summaryText =
+      typeof bookDetails.description === 'string'
+        ? bookDetails.description
+        : bookDetails.description.value;
   }
 
   return (
     <View style={styles.container}>
-      {/* Main Content */}
       <View style={styles.dashboardContainer}>
-        {/* Dropdown for Genre Selection */}
         <View style={styles.dropdownContainer}>
           <DropDownPicker
             open={open}
             value={selectedGenre}
             items={items}
             setOpen={setOpen}
-            setValue={(callback) => {
-              const newValue = callback(selectedGenre);
-              setSelectedGenre(newValue);
-            }}
+            setValue={(cb) => setSelectedGenre(cb(selectedGenre))}
             setItems={setItems}
             style={styles.dropdown}
             textStyle={styles.dropdownText}
@@ -223,27 +296,47 @@ export default function Dashboard() {
             zIndex={3000}
           />
         </View>
-  
-        {/* Content Area */}
+
         <View style={styles.contentContainer}>
           {isLoading ? (
             <ActivityIndicator size="large" color="#f44336" />
           ) : currentWork ? (
             <>
-              <View style={styles.bookContainer}>
+              <Animated.View
+                {...panResponder.panHandlers}
+                style={[
+                  styles.bookContainer,
+                  {
+                    transform: [{ translateX: pan }],
+                    opacity: fade,
+                  },
+                ]}
+              >
                 <Image
-                  source={{ uri: `https://covers.openlibrary.org/b/id/${currentWork.cover_id}-L.jpg` }}
+                  source={{
+                    uri: `https://covers.openlibrary.org/b/id/${currentWork.cover_id}-L.jpg`,
+                  }}
                   style={styles.bookCover}
                   resizeMode="contain"
                 />
-              </View>
-              {/* Action Buttons placed side by side underneath the cover */}
+              </Animated.View>
+
               <View style={styles.actionButtonsContainer}>
-                <TouchableOpacity style={styles.actionButton} onPress={handleXClick} disabled={isLoading}>
-                  <FontAwesome name="times" size={50} color="#ff6b6b" />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.actionButton} onPress={handleHeartClick} disabled={isLoading}>
+                {/* Like on the left */}
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={handleHeartClick}
+                  disabled={isLoading}
+                >
                   <FontAwesome name="heart" size={50} color="#ff6b6b" />
+                </TouchableOpacity>
+                {/* Dislike on the right */}
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={handleXClick}
+                  disabled={isLoading}
+                >
+                  <FontAwesome name="times" size={50} color="#ff6b6b" />
                 </TouchableOpacity>
               </View>
             </>
@@ -259,21 +352,14 @@ export default function Dashboard() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#eef2f5',
-  },
+  container: { flex: 1, backgroundColor: '#eef2f5' },
   dashboardContainer: {
     flex: 1,
     padding: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  dropdownContainer: {
-    width: '100%',
-    marginBottom: -30,
-    zIndex: 3000,
-  },
+  dropdownContainer: { width: '100%', marginBottom: -30, zIndex: 3000 },
   dropdown: {
     backgroundColor: '#ff6b6b',
     borderColor: 'black',
@@ -281,10 +367,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     height: 70,
   },
-  dropdownText: {
-    color: 'black',
-    fontWeight: 'bold',
-  },
+  dropdownText: { color: 'black', fontWeight: 'bold' },
   dropdownContainerStyle: {
     backgroundColor: '#ff6b6b',
     borderColor: 'black',
@@ -297,10 +380,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
   },
-  bookContainer: {
-    alignItems: 'center',
-    marginBottom: 10,
-  },
+  bookContainer: { alignItems: 'center', marginBottom: 10 },
   bookCover: {
     width: 325,
     height: 475,
@@ -327,14 +407,10 @@ const styles = StyleSheet.create({
   },
   bookInfo: {
     marginTop: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: 'rgba(255,255,255,0.8)',
     padding: 10,
     borderRadius: 4,
     maxWidth: 350,
   },
-  bookSummary: {
-    fontSize: 14,
-    color: '#444',
-    textAlign: 'center',
-  },
+  bookSummary: { fontSize: 14, color: '#444', textAlign: 'center' },
 });
