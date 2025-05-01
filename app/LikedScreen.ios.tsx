@@ -247,7 +247,7 @@ export default function LikedScreen() {
             <Text style={[styles.tableCell, styles.headerCell]}>Title</Text>
             <Text style={[styles.tableCell, styles.headerCell]}>Author</Text>
             <Text style={[styles.tableCell, styles.headerCell]}>Liked on</Text>
-            <View style={styles.removeHeader} />   {/* empty for alignment */}
+            <Text style={[styles.tableCell, styles.headerCell, { width: 40, textAlign: 'center' }]}>×</Text>
           </View>
 
           {likedBooks.length === 0 ? (
