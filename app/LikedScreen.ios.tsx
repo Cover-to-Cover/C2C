@@ -143,7 +143,7 @@ export default function LikedScreen() {
       const { entries } = await editionsRes.json();
   
       // Find the first edition that has an isbn_10 array
-      const bestEdition = entries.find(e => Array.isArray(e.isbn_10) && e.isbn_10.length > 0) || entries[0] || {};
+      const bestEdition = entries.find((e: any) => Array.isArray(e.isbn_10) && e.isbn_10.length > 0) || entries[0] || {};
       const isbn10 = Array.isArray(bestEdition.isbn_10) ? bestEdition.isbn_10[0] : '';
       const isbn13 = Array.isArray(bestEdition.isbn_13) ? bestEdition.isbn_13[0] : '';
   

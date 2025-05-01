@@ -134,11 +134,10 @@ export default function DashboardScreen() {
   const fade = useRef(new Animated.Value(1)).current;
   const swipeThreshold = 100;
 
-  // pan responder
+  // pan responder: swipe and fade out on release
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
-      // update horizontal position
       onPanResponderMove: Animated.event(
         [null, { dx: pan }],
         { useNativeDriver: false }
@@ -159,8 +158,7 @@ export default function DashboardScreen() {
             }),
           ]).start(() => {
             heartRef.current();
-            pan.setValue(0);
-            fade.setValue(1);
+            // pan/fade reset moved to book load effect
           });
         } else if (dx > swipeThreshold) {
           // swipe right → dislike: slide off to right + fade out
@@ -177,8 +175,7 @@ export default function DashboardScreen() {
             }),
           ]).start(() => {
             xRef.current();
-            pan.setValue(0);
-            fade.setValue(1);
+            // pan/fade reset moved to book load effect
           });
         } else {
           // not far enough → spring back
@@ -191,6 +188,19 @@ export default function DashboardScreen() {
       },
     })
   ).current;
+
+  // reset animations and fade-in after new book loads
+  useEffect(() => {
+    if (currentWork) {
+      pan.setValue(0);
+      fade.setValue(0);
+      Animated.timing(fade, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: false,
+      }).start();
+    }
+  }, [currentWork]);
 
   // auth check
   useEffect(() => {
@@ -306,10 +316,7 @@ export default function DashboardScreen() {
                 {...panResponder.panHandlers}
                 style={[
                   styles.bookContainer,
-                  {
-                    transform: [{ translateX: pan }],
-                    opacity: fade,
-                  },
+                  { transform: [{ translateX: pan }], opacity: fade },
                 ]}
               >
                 <Image
