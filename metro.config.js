@@ -1,18 +1,22 @@
 // metro.config.js
-const { getDefaultConfig } = require("expo/metro-config");
-const nodeLibs = require("node-libs-react-native");
-
-// stub out server‐only cores
-nodeLibs.net = require.resolve("empty-module");
-nodeLibs.tls = require.resolve("empty-module");
-// (you can also stub fs, path, etc., here if needed)
+const { getDefaultConfig } = require('@expo/metro-config');
+const nodeLibs = require('node-libs-react-native');
 
 const config = getDefaultConfig(__dirname);
-config.resolver = {
-  ...config.resolver,
-  extraNodeModules: {
-    ...(config.resolver.extraNodeModules || {}),
-    ...nodeLibs,
-  },
+
+config.resolver.extraNodeModules = {
+  ...nodeLibs,
+  stream: require.resolve('stream-browserify'),
+  net:    require.resolve('empty-module'),
+  tls:    require.resolve('empty-module'),  // add this line
+  // add more stubs here as you hit other “native Node” module errors
 };
+
+config.transformer.getTransformOptions = async () => ({
+  transform: {
+    experimentalImportSupport: false,
+    inlineRequires: false,
+  },
+});
+
 module.exports = config;
