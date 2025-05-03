@@ -1,27 +1,32 @@
-// app/_layout.tsx
+// app/_layout.ios.tsx
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Stack, useSegments } from 'expo-router';
-import Header from '../components/Header.ios';
-import FooterNav from '../components/FooterNav.ios';
+import { Stack, usePathname } from 'expo-router';
+import Header from '../components/Header';
+import FooterNav from '../components/Footer';
 
 export default function Layout() {
-  const segments = useSegments();
-  // Check if any segment starts with '(' indicating a route group such as auth.
-  // Adjust the logic if needed based on your folder structure.
-  const isAuthScreen = segments.some(segment => segment.startsWith('('));
+  const pathname = usePathname();
+  // Define the list of auth routes (adjust these as needed)
+  const authRoutes = ['/LoginScreen', '/RegisterScreen'];
+  // Check if the current pathname is one of the auth screens
+  const isAuthScreen = authRoutes.includes(pathname);
 
   return (
     <View style={styles.container}>
-      {/* Only show the header if not an auth screen */}
+      {/* Only render Header if not on an auth screen */}
       {!isAuthScreen && <Header />}
       
-      {/* Route Content */}
       <View style={styles.content}>
-        <Stack screenOptions={{ headerShown: false }} />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            gestureEnabled: false,
+          }}
+        />
       </View>
-
-      {/* Only show the footer if not an auth screen */}
+      
+      {/* Only render Footer if not on an auth screen */}
       {!isAuthScreen && <FooterNav />}
     </View>
   );

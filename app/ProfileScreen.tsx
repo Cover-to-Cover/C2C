@@ -1,147 +1,239 @@
-// app/ProfileScreen.tsx
-import React, { useEffect, useState } from 'react'; // Import React and hooks for component state and lifecycle management.
-import { supabase } from '../lib/supabaseClient'; // Import the Supabase client to interact with authentication and database.
-import { useRouter } from 'expo-router'; // Import the Expo Router hook for navigating between screens.
-import './Profiles.css'; // Import CSS file for component styling.
-import { navigate } from 'expo-router/build/global-state/routing'; // Import navigate (if needed) for navigation global state.
+// app/ProfileScreen.ios.tsx
+// This screen displays the user's profile, allows them to change their password, and provides a logout option.
 
-// Define an interface representing a user profile with at least 'id' and 'email' fields.
-// Additional profile fields can be added as needed.
+import React, { useEffect, useState } from 'react'; // Import React and hooks for state and side effects.
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native'; // Import basic React Native components.
+import { supabase } from '../lib/supabaseClient'; // Import the Supabase client to handle authentication and database actions.
+import { useRouter } from 'expo-router'; // Import the router hook for navigation between screens.
+
+// Define an interface for the user's profile data.
 interface UserProfile {
   id: string;
   email: string;
-  // add additional profile fields as needed
+  // additional profile fields as needed can be added here
 }
 
-// Define the Profiles functional component using React.FC.
-const Profiles: React.FC = () => {
-  // Define state for storing the user's profile information; initially null.
+// Define and export the ProfileScreen component.
+export default function ProfileScreen() {
+  // State to store the current user's profile, initially null before the data is fetched.
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  // State for the new password input field.
+  // State for storing the value of the new password input field.
   const [newPassword, setNewPassword] = useState('');
-  // State for the confirm password input field.
+  // State for storing the value of the confirm password input field.
   const [confirmPassword, setConfirmPassword] = useState('');
-  // State to store and display messages related to password change actions.
+  // State for displaying messages related to password changes (error or success messages).
   const [passwordMessage, setPasswordMessage] = useState('');
-  // Get the router object for navigating between screens.
+  // Access the router object to programmatically navigate to other screens.
   const router = useRouter();
 
-  // useEffect hook to fetch the user profile when the component mounts or when 'navigate' changes.
+  // useEffect hook runs on component mount (and when router changes)
+  // It fetches the current user's session and loads the profile if available.
   useEffect(() => {
     const fetchProfile = async () => {
-      // Get the current session details from Supabase authentication.
+      // Get the current session from Supabase authentication.
       const { data: { session } } = await supabase.auth.getSession();
-      // Check if a user session exists.
+      // If a user session exists, update the profile state.
       if (session?.user) {
-        // If a valid session exists, store the user profile details in state.
         setProfile({
           id: session.user.id,
-          email: session.user.email ?? '', // Use an empty string if email is null.
+          email: session.user.email ?? '', // Use an empty string if the email is null.
         });
       } else {
-        // If no valid session exists, redirect to the LoginScreen.
-        router.push('/LoginScreen');
+        // If no valid session exists, navigate to the login screen.
+        router.push('/login');
       }
     };
-    // Call the asynchronous function to fetch the profile.
     fetchProfile();
-  }, [navigate]); // The dependency array includes 'navigate', ensuring the effect runs on changes (though this might be redundant).
+  }, [router]); // Depend on the router to re-run the effect if it ever changes.
 
-  // Function to handle user logout.
+  // Function to handle logging out the user.
+  // It calls supabase.auth.signOut and redirects to the LoginScreen.
   const handleLogout = async () => {
-    // Call Supabase's signOut method.
     const { error } = await supabase.auth.signOut();
-    // Log an error if sign-out failed.
     if (error) {
       console.error('Error signing out:', error.message);
     }
-    // Redirect the user to the LoginScreen after logging out.
     router.push('/LoginScreen');
   };
 
-  // Function to handle the password change form submission.
-  const handleChangePassword = async (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent the default form submission behavior.
-    setPasswordMessage(''); // Clear any previous messages.
+  // Function to handle password change when the user submits the change password request.
+  const handleChangePassword = async () => {
+    // Clear any previous password messages.
+    setPasswordMessage('');
 
-    // Check if the new password and confirmation password match.
+    // Validate that the new password matches the confirmation password.
     if (newPassword !== confirmPassword) {
       setPasswordMessage('Passwords do not match.');
       return;
     }
 
-    // Validate that the new password meets the minimum length requirement.
+    // Validate that the new password meets a minimum length requirement (6 characters).
     if (newPassword.length < 6) {
       setPasswordMessage('Password must be at least 6 characters long.');
       return;
     }
 
-    // Attempt to update the user's password via Supabase.
+    // Update the user's password via Supabase.
     const { error } = await supabase.auth.updateUser({ password: newPassword });
-
-    // Check if there was an error updating the password.
     if (error) {
+      // If there's an error, log it and show an error message.
       console.error('Error updating password:', error.message);
       setPasswordMessage('Error updating password: ' + error.message);
     } else {
-      // On success, inform the user and clear the input fields.
+      // On success, show a success message and clear the password fields.
       setPasswordMessage('Password updated successfully!');
       setNewPassword('');
       setConfirmPassword('');
     }
   };
 
-  // Render the profile screen UI.
   return (
-    <div className="profiles-container">
-      <h1>Profile</h1>
-      {/* Conditional rendering: display profile details if profile data exists */}
+    // Main container for the profile screen, styled using the profilesContainer style.
+    <View style={styles.profilesContainer}>
+      {/* Heading for the profile screen */}
+      <Text style={styles.heading}>Profile</Text>
       {profile ? (
-        <div className="profile-content">
-          <p>Email: {profile.email}</p>
+        // If the profile data has been fetched, display it and render the profile content.
+        <View style={styles.profileContent}>
+          {/* Display the user's email */}
+          <Text style={styles.text}>Email: {profile.email}</Text>
 
-          <h2>Change Password</h2>
-          {/* Form for changing the password */}
-          <form onSubmit={handleChangePassword} className="password-form">
-            <div className="form-group">
-              <label htmlFor="new-password">New Password:</label>
-              <input
-                id="new-password"
-                type="password"
+          {/* Section for changing the password */}
+          <Text style={styles.subHeading}>Change Password</Text>
+          <View style={styles.passwordForm}>
+            {/* Input field for new password */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>New Password:</Text>
+              <TextInput
+                style={styles.input}
+                secureTextEntry
                 value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)} // Update state with new password value.
-                required
+                onChangeText={setNewPassword} // Update newPassword state on change.
               />
-            </div>
-            <div className="form-group">
-              <label htmlFor="confirm-password">Confirm Password:</label>
-              <input
-                id="confirm-password"
-                type="password"
+            </View>
+            {/* Input field for confirming the new password */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Confirm Password:</Text>
+              <TextInput
+                style={styles.input}
+                secureTextEntry
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)} // Update state with confirm password value.
-                required
+                onChangeText={setConfirmPassword} // Update confirmPassword state on change.
               />
-            </div>
-            <button type="submit" className="change-password-button">
-              Change Password
-            </button>
-          </form>
+            </View>
+            {/* Button to trigger the password change process */}
+            <TouchableOpacity style={styles.changePasswordButton} onPress={handleChangePassword}>
+              <Text style={styles.buttonText}>Change Password</Text>
+            </TouchableOpacity>
+          </View>
 
-          {/* Display a message if there is any feedback from the password change action */}
-          {passwordMessage && <p className="password-message">{passwordMessage}</p>}
+          {/* Display any feedback message regarding the password change */}
+          {passwordMessage ? <Text style={styles.passwordMessage}>{passwordMessage}</Text> : null}
 
-          {/* Logout button for signing out; placed at the bottom of the profile content */}
-          <button className="logout-button" onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
+          {/* Logout button to sign out the user */}
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.buttonText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
       ) : (
-        // Display a loading message while the profile data is being fetched.
-        <p>Loading profile...</p>
+        // If the profile data isn't yet loaded, display a loading message.
+        <Text style={styles.loadingText}>Loading profile...</Text>
       )}
-    </div>
+    </View>
   );
-};
+}
 
-export default Profiles; // Export the Profiles component for use in other parts of the application.
+// Define styles using React Native's StyleSheet for consistent styling across the component.
+const styles = StyleSheet.create({
+  profilesContainer: {
+    flex: 1,                        // Occupies the entire screen.
+    backgroundColor: '#fff',        // White background color.
+    alignItems: 'center',           // Center content horizontally.
+    justifyContent: 'center',       // Center content vertically.
+    padding: 16,                    // Add padding around the container.
+  },
+  heading: {
+    fontSize: 28,                   // Larger font size for the heading.
+    fontWeight: 'bold',             // Bold font for emphasis.
+    marginBottom: 16,               // Space below the heading.
+    textAlign: 'center',            // Center-align the heading text.
+    color: '#333',                  // Dark color for the heading.
+  },
+  profileContent: {
+    width: '100%',                  // Occupies full width of the container.
+    alignItems: 'center',           // Center content horizontally.
+  },
+  text: {
+    fontSize: 16,                   // Standard font size for text.
+    marginBottom: 8,                // Space below the text.
+    color: '#333',                  // Dark text color.
+    textAlign: 'center',            // Center-align text.
+  },
+  subHeading: {
+    fontSize: 22,                   // Slightly larger font size for subheadings.
+    fontWeight: 'bold',             // Bold font for subheadings.
+    marginBottom: 8,                // Space below the subheading.
+    color: '#333',                  // Dark color for the subheading.
+    textAlign: 'center',            // Center-align the subheading.
+  },
+  passwordForm: {
+    marginTop: 16,                  // Space above the password form.
+    width: '90%',                   // Form takes up 90% of the container width.
+    alignItems: 'center',           // Center form elements horizontally.
+  },
+  formGroup: {
+    marginBottom: 16,               // Space below each form group.
+    width: '100%',                  // Each form group occupies full width.
+    alignItems: 'center',           // Center content horizontally.
+  },
+  label: {
+    marginBottom: 4,                // Space between the label and the input.
+    fontWeight: 'bold',             // Bold text for labels.
+    color: '#333',                  // Dark color for labels.
+    textAlign: 'center',            // Center-align labels.
+  },
+  input: {
+    width: '100%',                  // Input field occupies full width.
+    padding: 8,                     // Padding inside input fields.
+    borderWidth: 2,                 // Border width for inputs.
+    borderColor: '#ccc',            // Light grey border color.
+    borderRadius: 5,                // Rounded corners for inputs.
+    textAlign: 'center',            // Center-align text inside inputs.
+  },
+  changePasswordButton: {
+    backgroundColor: '#f44336',     // Red background color for the button.
+    paddingVertical: 8,             // Vertical padding for the button.
+    paddingHorizontal: 16,          // Horizontal padding for the button.
+    borderWidth: 2,                 // Border width for the button.
+    borderColor: 'black',           // Black border color.
+    borderRadius: 5,                // Rounded corners for the button.
+    marginTop: 8,                   // Space above the button.
+    alignItems: 'center',           // Center the button content.
+  },
+  logoutButton: {
+    backgroundColor: '#f44336',     // Red background color for the logout button.
+    paddingVertical: 8,             // Vertical padding for the logout button.
+    paddingHorizontal: 16,          // Horizontal padding for the logout button.
+    borderWidth: 2,                 // Border width for the logout button.
+    borderColor: 'black',           // Black border color.
+    borderRadius: 5,                // Rounded corners for the button.
+    marginTop: 16,                  // Space above the logout button.
+    alignItems: 'center',           // Center the logout button content.
+  },
+  buttonText: {
+    color: 'white',                 // White text color for buttons.
+    fontWeight: 'bold',             // Bold text for buttons.
+    fontSize: 16,                   // Standard font size for button text.
+  },
+  passwordMessage: {
+    marginTop: 8,                   // Space above the password message.
+    fontWeight: 'bold',             // Bold text for emphasis.
+    color: '#333',                  // Dark text color for readability.
+    textAlign: 'center',            // Center-align the password message.
+  },
+  loadingText: {
+    fontSize: 16,                   // Standard font size for loading text.
+    color: '#333',                  // Dark color for the text.
+    textAlign: 'center',            // Center-align loading text.
+  },
+});
