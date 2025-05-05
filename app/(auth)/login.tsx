@@ -51,7 +51,10 @@ export default function LoginScreen() {
     });
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: redirectUri }
+      options: {
+        // this must exactly match one of the Redirect URLs above:
+        redirectTo: 'https://www.covertocoverapp.com/dashboard',
+      }
     });
     if (error) {
       console.error('Google OAuth error:', error.message);
