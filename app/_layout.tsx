@@ -2,8 +2,8 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Stack, usePathname } from 'expo-router';
-import Header from '../components/header';
-import FooterNav from '../components/footer';
+import Header from '../components/Header';
+import FooterNav from '../components/Footer';
 
 export default function Layout() {
   const pathname = usePathname();
