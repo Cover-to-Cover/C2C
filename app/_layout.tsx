@@ -1,4 +1,4 @@
-// app/_layout.ios.tsx
+// app/_layout.tsx
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Stack, usePathname } from 'expo-router';
@@ -8,7 +8,7 @@ import FooterNav from '../components/Footer';
 export default function Layout() {
   const pathname = usePathname();
   // Define the list of auth routes (adjust these as needed)
-  const authRoutes = ['/LoginScreen', '/RegisterScreen'];
+  const authRoutes = ['/login', '/register'];
   // Check if the current pathname is one of the auth screens
   const isAuthScreen = authRoutes.includes(pathname);
 
