@@ -1,4 +1,4 @@
-// FooterNav.ios.tsx
+// Footer.tsx
 // This file defines a footer navigation component for iOS using Expo.
 // The component displays navigation options with icons and labels, and navigates to different screens using the Expo router.
 

@@ -1,4 +1,4 @@
-// components/Header.ios.tsx
+// components/Header.tsx
 import React from 'react'; // Import React for creating the component and using JSX
 import { View, Text, StyleSheet, Dimensions } from 'react-native'; // Import core React Native components and StyleSheet for styling
 import { useSegments } from 'expo-router'; // Import the hook to access navigation segments from the expo-router

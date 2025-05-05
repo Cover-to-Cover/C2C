@@ -65,13 +65,24 @@ export default function DashboardScreen() {
   const [bookDetails, setBookDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
-  // 80% of screen but no more than 350px wide
-  const COVER_WIDTH  = Math.min(screenWidth * 0.8, 350);
-  // keep the same aspect ratio
-  const COVER_HEIGHT = COVER_WIDTH * (475 / 325);
-  // 20% of screen but no more than 80px buttons
-  const BUTTON_SIZE   = Math.min(screenWidth * 0.4, 80);
-  const BUTTON_MARGIN = (screenWidth - BUTTON_SIZE * 2) / 6;
+  const HEADER_HEIGHT = screenHeight * 0.10;  // must match your Header.tsx
+  const FOOTER_HEIGHT = 70;                  // must match your Footer.tsx
+  const DROPDOWN_HEIGHT = 60;                // approx. the height of your picker + its margin
+  const VERTICAL_PADDING = 40;               // any extra top/bottom padding you want
+  const availableHeight =
+    screenHeight
+    - HEADER_HEIGHT
+    - FOOTER_HEIGHT
+    - DROPDOWN_HEIGHT
+    - VERTICAL_PADDING;
+  
+    const maxCoverWidth  = Math.min(screenWidth * 0.8, 350);
+    const maxCoverHeight = maxCoverWidth * (475 / 325);
+    const COVER_HEIGHT = Math.min(maxCoverHeight, availableHeight * 0.7);
+    const COVER_WIDTH  = COVER_HEIGHT * (325 / 475);
+
+    const BUTTON_SIZE   = Math.min(screenWidth * 0.25, availableHeight * 0.15, 80);
+    const BUTTON_MARGIN = (screenWidth - BUTTON_SIZE * 2) / 6;
   
   // dropdown state
   const [open, setOpen] = useState(false);
@@ -331,7 +342,7 @@ export default function DashboardScreen() {
                     uri: `https://covers.openlibrary.org/b/id/${currentWork.cover_id}-L.jpg`,
                   }}
                   style={{
-                    width:  COVER_WIDTH,
+                    width: COVER_WIDTH,
                     height: COVER_HEIGHT,
                     borderWidth: 2,
                     borderColor: 'black',
@@ -347,7 +358,7 @@ export default function DashboardScreen() {
                   style={{
                     width: BUTTON_SIZE,
                     height: BUTTON_SIZE,
-                    borderRadius: BUTTON_SIZE/2,
+                    borderRadius: BUTTON_SIZE / 2,
                     borderWidth: 3,
                     borderColor: 'black',
                     marginHorizontal: BUTTON_MARGIN,
@@ -365,7 +376,7 @@ export default function DashboardScreen() {
                   style={{
                     width: BUTTON_SIZE,
                     height: BUTTON_SIZE,
-                    borderRadius: BUTTON_SIZE/2,
+                    borderRadius: BUTTON_SIZE / 2,
                     borderWidth: 3,
                     borderColor: 'black',
                     marginHorizontal: BUTTON_MARGIN,
@@ -399,7 +410,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  dropdownContainer: { width: '100%', marginBottom: -30, zIndex: 3000 },
+  dropdownContainer: { width: '100%', marginBottom: 20, zIndex: 3000 },
   dropdown: {
     backgroundColor: '#ff6b6b',
     borderColor: 'black',
