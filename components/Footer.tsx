@@ -31,7 +31,7 @@ export default function Footer() {
       {/* Navigation item: Home */}
       <TouchableOpacity
         style={styles.navItem}
-        onPress={() => navigate('/DashboardScreen')} // Navigate to DashboardScreen when pressed.
+        onPress={() => navigate('/dashboard')} // Navigate to DashboardScreen when pressed.
       >
         {/* Home icon using FontAwesome */}
         <FontAwesome name="home" size={24} color="#fff" />
@@ -42,7 +42,7 @@ export default function Footer() {
       {/* Navigation item: Liked */}
       <TouchableOpacity
         style={styles.navItem}
-        onPress={() => navigate('/LikedScreen')} // Navigate to LikedScreen when pressed.
+        onPress={() => navigate('/liked')} // Navigate to LikedScreen when pressed.
       >
         {/* Liked icon using FontAwesome */}
         <FontAwesome name="heart" size={24} color="#fff" />
@@ -53,7 +53,7 @@ export default function Footer() {
       {/* Navigation item: Awards */}
       <TouchableOpacity
         style={styles.navItem}
-        onPress={() => navigate('/AwardsScreen')} // Navigate to AwardsScreen when pressed.
+        onPress={() => navigate('/awards')} // Navigate to AwardsScreen when pressed.
       >
         {/* Awards icon using FontAwesome */}
         <FontAwesome name="trophy" size={24} color="#fff" />
@@ -64,7 +64,7 @@ export default function Footer() {
       {/* Navigation item: Profile */}
       <TouchableOpacity
         style={styles.navItem}
-        onPress={() => navigate('/ProfileScreen')} // Navigate to ProfileScreen when pressed.
+        onPress={() => navigate('/profile')} // Navigate to ProfileScreen when pressed.
       >
         {/* Profile icon using FontAwesome */}
         <FontAwesome name="user" size={24} color="#fff" />

@@ -1,4 +1,4 @@
-// app/LikedScreen.ios.tsx
+// app/liked.tsx
 // This screen displays the user's list of liked books and allows for viewing extended details
 // via a slide-in animation, handling swipe gestures for back navigation, and removing a book.
 import React, { useEffect, useState, useRef } from 'react'; // Import React and hooks for state, effects, and references.

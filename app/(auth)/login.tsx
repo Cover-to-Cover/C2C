@@ -1,4 +1,4 @@
-// app/LoginScreen.tsx
+// app/login.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useRouter } from 'expo-router';

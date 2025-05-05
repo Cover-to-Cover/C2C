@@ -1,4 +1,4 @@
-// app/DashboardScreen.ios.tsx
+// app/dashboard.tsx
 import React, { useEffect, useState, useRef } from 'react';
 import {
   View,

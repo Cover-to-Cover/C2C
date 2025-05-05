@@ -35,12 +35,12 @@ export default function RegisterScreen() {
     if (error) {
       setErrorMessage(error.message);
     } else {
-      router.push('/LoginScreen');
+      router.push('/login');
     }
   };
 
   const handleBackToLogin = () => {
-    router.push('/LoginScreen');
+    router.push('/login');
   };
 
   return (

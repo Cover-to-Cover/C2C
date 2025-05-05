@@ -1,4 +1,4 @@
-// app/ProfileScreen.ios.tsx
+// app/profile.tsx
 // This screen displays the user's profile, allows them to change their password, and provides a logout option.
 
 import React, { useEffect, useState } from 'react'; // Import React and hooks for state and side effects.
@@ -53,7 +53,7 @@ export default function ProfileScreen() {
     if (error) {
       console.error('Error signing out:', error.message);
     }
-    router.push('/LoginScreen');
+    router.push('/login');
   };
 
   // Function to handle password change when the user submits the change password request.
