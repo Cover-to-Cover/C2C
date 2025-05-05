@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "C2CNative",
-    "slug": "C2CNative",
+    "name": "Cover to Cover",
+    "slug": "cover-to-cover",
+    "owner": "alexpatten",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/book.png",

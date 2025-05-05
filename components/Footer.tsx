@@ -8,7 +8,7 @@ import { useRouter, usePathname } from 'expo-router'; // Import hooks for naviga
 import { FontAwesome } from '@expo/vector-icons'; // Import FontAwesome icons for visual cues in the navigation.
 
 // Define and export the FooterNav functional component.
-export default function FooterNav() {
+export default function Footer() {
   // useRouter returns the router object for handling navigation.
   const router = useRouter();
 

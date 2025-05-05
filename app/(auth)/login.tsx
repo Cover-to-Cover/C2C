@@ -1,62 +1,73 @@
+// app/LoginScreen.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
+import { makeRedirectUri } from 'expo-auth-session';
 import { supabase } from '../../lib/supabaseClient';
+
+// Required for Expo AuthSession redirect handling
+WebBrowser.maybeCompleteAuthSession();
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
   const router = useRouter();
-  // Create a reference for the password input
   const passwordInputRef = useRef<TextInput>(null);
 
-  // Check for an active session when the component mounts.
   useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+    // 1) If user already has an active session, send to dashboard
+    supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
-        router.push('/DashboardScreen');
+        router.replace('/dashboard');
       }
+    });
+
+    // 2) Listen for future login events (including OAuth)
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        router.replace('/dashboard');
+      }
+    });
+
+    return () => {
+      listener.subscription.unsubscribe();
     };
-    checkSession();
   }, []);
 
   const handleLogin = async () => {
     setErrorMessage('');
-    try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        setErrorMessage(error.message);
-      } else {
-        router.push('/DashboardScreen');
-      }
-    } catch (err) {
-      setErrorMessage((err as Error).message);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setErrorMessage(error.message);
     }
+    // on success, onAuthStateChange will fire and navigate
   };
 
-  // Google authentication is commented out for now.
   const handleGoogleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
+    const redirectUri = makeRedirectUri({
+      scheme: 'cover-to-cover',
+    });
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
+      options: { redirectTo: redirectUri }
     });
     if (error) {
-      console.error('Google login error:', error.message);
+      console.error('Google OAuth error:', error.message);
+    } else if (data.url) {
+      // open the OAuth consent screen
+      await WebBrowser.openBrowserAsync(data.url);
     }
   };
 
   const handleGoToRegister = () => {
-    router.push('/RegisterScreen');
+    router.push('/register');
   };
 
   return (
     <View style={styles.container}>
-      <Image
-        source={require('../../assets/logo.png')}
-        style={styles.logo}
-      />
+      <Image source={require('../../assets/logo.png')} style={styles.logo} />
 
       <Text style={styles.header}>Login</Text>
       {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
@@ -70,7 +81,7 @@ export default function LoginScreen() {
         keyboardType="email-address"
         autoCapitalize="none"
         returnKeyType="next"
-        onSubmitEditing={() => passwordInputRef.current && passwordInputRef.current.focus()}
+        onSubmitEditing={() => passwordInputRef.current?.focus()}
       />
 
       <TextInput
@@ -82,17 +93,18 @@ export default function LoginScreen() {
         secureTextEntry
         onChangeText={setPassword}
         returnKeyType="done"
+        onSubmitEditing={handleLogin}
       />
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.button} onPress={handleGoToRegister}>
           <Text style={styles.buttonText}>Register</Text>
         </TouchableOpacity>
       </View>
+
       <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin}>
         <Image
           source={{ uri: 'https://developers.google.com/identity/images/g-logo.png' }}
@@ -115,8 +127,8 @@ const styles = StyleSheet.create({
   logo: {
     width: 300,
     height: 350,
-    marginBottom: 10,   
     marginTop: 75,
+    marginBottom: 10,
     resizeMode: 'contain',
   },
   header: {
@@ -137,7 +149,6 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 4,
     backgroundColor: '#fff',
-    // "color" is set via inline style to ensure the text is visible
   },
   buttonContainer: {
     flexDirection: 'row',
