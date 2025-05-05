@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',         // Align the items vertically at the center.
     backgroundColor: '#333',      // Dark background for the footer.
     height: 70,                   // Fixed height for the footer.
-    paddingBottom: 10,            // Bottom padding to create space for items.
+    paddingBottom: 5,            // Bottom padding to create space for items.
     borderTopWidth: 1,            // Add a top border.
     borderTopColor: 'black',      // Top border color.
     width: '100%',                // Full width of the device screen.

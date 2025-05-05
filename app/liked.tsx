@@ -21,6 +21,7 @@ import {
 import { supabase } from '../lib/supabaseClient'; // Import the Supabase client for backend operations.
 import { useRouter } from 'expo-router'; // Import the router hook to handle navigation.
 import { FontAwesome } from '@expo/vector-icons'; // Import FontAwesome icons for UI elements.
+import { ActivityIndicator } from 'react-native';
 
 // Define a TypeScript interface that represents a liked book.
 interface LikedBook {
@@ -49,6 +50,8 @@ export default function LikedScreen() {
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current;
   // Retrieve screen width for later use in animation.
   const screenWidth = Dimensions.get('window').width;
+  // Loader
+  const [loadingDetails, setLoadingDetails] = useState(false);
 
   // Set up PanResponder to detect left-to-right swipe gestures.
   // When a significant horizontal swipe is detected, trigger the "back" functionality.
@@ -160,14 +163,12 @@ export default function LikedScreen() {
       };
   
       setSelectedBook(extendedBook);
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
+      Animated.timing(slideAnim, { toValue: 0, duration: 300, useNativeDriver: true }).start();
     } catch (err) {
       console.error('Error fetching OpenLibrary data:', err);
       setSelectedBook({ ...book, description: 'No description available.' });
+    } finally {
+      setLoadingDetails(false);
     }
   };
 
@@ -237,6 +238,15 @@ export default function LikedScreen() {
       Linking.openURL(`https://www.directtextbook.com/isbn/${selectedBook.isbn13}`);
     }
   };
+
+  if (loadingDetails) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#f44336" />
+        <Text style={{ marginTop: 10, color: '#333' }}>Loading details…</Text>
+      </View>
+    );
+  }
 
   // If no book is selected, render the list view.
   if (!selectedBook) {
@@ -334,6 +344,10 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 0,
     backgroundColor: '#f0f4f7',
+  },
+  loaderContainer: {
+    flex: 1, justifyContent: 'center', alignItems: 'center',
+    backgroundColor: '#f0f4f7'
   },
   tableContainer: {
     padding: 0,

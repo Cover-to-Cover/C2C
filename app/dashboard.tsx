@@ -10,13 +10,12 @@ import {
   Animated,
   PanResponder,
   Dimensions,
+  useWindowDimensions,
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useRouter } from 'expo-router';
 import { supabase } from '../lib/supabaseClient';
 import { FontAwesome } from '@expo/vector-icons';
-
-const SCREEN_WIDTH = Dimensions.get('window').width;
 
 // --- types & constants ---
 interface Work {
@@ -65,7 +64,15 @@ export default function DashboardScreen() {
   const [currentWork, setCurrentWork] = useState<Work | null>(null);
   const [bookDetails, setBookDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  // 80% of screen but no more than 350px wide
+  const COVER_WIDTH  = Math.min(screenWidth * 0.8, 350);
+  // keep the same aspect ratio
+  const COVER_HEIGHT = COVER_WIDTH * (475 / 325);
+  // 20% of screen but no more than 80px buttons
+  const BUTTON_SIZE   = Math.min(screenWidth * 0.4, 80);
+  const BUTTON_MARGIN = (screenWidth - BUTTON_SIZE * 2) / 6;
+  
   // dropdown state
   const [open, setOpen] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState('Science Fiction');
@@ -147,7 +154,7 @@ export default function DashboardScreen() {
           // swipe left → like: slide off to left + fade out
           Animated.parallel([
             Animated.timing(pan, {
-              toValue: -SCREEN_WIDTH,
+              toValue: -screenWidth,
               duration: 200,
               useNativeDriver: false,
             }),
@@ -164,7 +171,7 @@ export default function DashboardScreen() {
           // swipe right → dislike: slide off to right + fade out
           Animated.parallel([
             Animated.timing(pan, {
-              toValue: SCREEN_WIDTH,
+              toValue: screenWidth,
               duration: 200,
               useNativeDriver: false,
             }),
@@ -323,7 +330,13 @@ export default function DashboardScreen() {
                   source={{
                     uri: `https://covers.openlibrary.org/b/id/${currentWork.cover_id}-L.jpg`,
                   }}
-                  style={styles.bookCover}
+                  style={{
+                    width:  COVER_WIDTH,
+                    height: COVER_HEIGHT,
+                    borderWidth: 2,
+                    borderColor: 'black',
+                    borderRadius: 4,
+                  }}
                   resizeMode="contain"
                 />
               </Animated.View>
@@ -331,19 +344,39 @@ export default function DashboardScreen() {
               <View style={styles.actionButtonsContainer}>
                 {/* Like on the left */}
                 <TouchableOpacity
-                  style={styles.actionButton}
+                  style={{
+                    width: BUTTON_SIZE,
+                    height: BUTTON_SIZE,
+                    borderRadius: BUTTON_SIZE/2,
+                    borderWidth: 3,
+                    borderColor: 'black',
+                    marginHorizontal: BUTTON_MARGIN,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: '#f8f8f8',
+                  }}
                   onPress={handleHeartClick}
                   disabled={isLoading}
                 >
-                  <FontAwesome name="heart" size={50} color="#ff6b6b" />
+                  <FontAwesome name="heart" size={BUTTON_SIZE * 0.5} color="#ff6b6b" />
                 </TouchableOpacity>
                 {/* Dislike on the right */}
                 <TouchableOpacity
-                  style={styles.actionButton}
+                  style={{
+                    width: BUTTON_SIZE,
+                    height: BUTTON_SIZE,
+                    borderRadius: BUTTON_SIZE/2,
+                    borderWidth: 3,
+                    borderColor: 'black',
+                    marginHorizontal: BUTTON_MARGIN,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: '#f8f8f8',
+                  }}
                   onPress={handleXClick}
                   disabled={isLoading}
                 >
-                  <FontAwesome name="times" size={50} color="#ff6b6b" />
+                  <FontAwesome name="times" size={BUTTON_SIZE * 0.5} color="#ff6b6b" />
                 </TouchableOpacity>
               </View>
             </>
@@ -372,7 +405,7 @@ const styles = StyleSheet.create({
     borderColor: 'black',
     borderWidth: 1,
     borderRadius: 8,
-    height: 70,
+    height: 50,
   },
   dropdownText: { color: 'black', fontWeight: 'bold' },
   dropdownContainerStyle: {
@@ -389,8 +422,6 @@ const styles = StyleSheet.create({
   },
   bookContainer: { alignItems: 'center', marginBottom: 10 },
   bookCover: {
-    width: 325,
-    height: 475,
     borderWidth: 2,
     borderColor: 'black',
     borderRadius: 4,
@@ -402,12 +433,9 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   actionButton: {
-    marginHorizontal: 45,
-    width: 100,
-    height: 100,
     borderWidth: 2,
     borderColor: 'black',
-    borderRadius: 60,
+    borderRadius: 999,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#f8f8f8',

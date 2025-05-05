@@ -1,7 +1,19 @@
 // components/Header.ios.tsx
 import React from 'react'; // Import React for creating the component and using JSX
-import { View, Text, StyleSheet } from 'react-native'; // Import core React Native components and StyleSheet for styling
+import { View, Text, StyleSheet, Dimensions } from 'react-native'; // Import core React Native components and StyleSheet for styling
 import { useSegments } from 'expo-router'; // Import the hook to access navigation segments from the expo-router
+
+// Calculate dynamic header height as 15% of the device window height
+const windowHeight = Dimensions.get('window').height;
+const HEADER_HEIGHT = windowHeight * 0.10;
+
+// Utility to convert string to Title Case
+function toTitleCase(str: string) {
+  return str
+    .split(/[-_ ]+/)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
 
 // Define a functional component called Header using React.FC for type checking
 const Header: React.FC = () => {
@@ -14,10 +26,11 @@ const Header: React.FC = () => {
 
   // Remove the word "Screen" (case-insensitive) if it's at the end of the title.
   title = title.replace(/screen$/i, '');
+  title = toTitleCase(title);
 
   // Render the header using a View container and a Text component for the title.
   return (
-    <View style={styles.header}>
+    <View style={[styles.header, { height: HEADER_HEIGHT }]}>
       {/* Display the computed title in the styled Text component */}
       <Text style={styles.headerText}>{title}</Text>
     </View>
@@ -28,12 +41,10 @@ const Header: React.FC = () => {
 const styles = StyleSheet.create({
   header: {
     backgroundColor: '#333',       // Set a dark background color for the header
-    height: 100,                   // Define a fixed height for the header component
     alignItems: 'baseline',        // Align children along the baseline (useful for text alignment)
     justifyContent: 'center',      // Center children vertically within the container
     borderBottomWidth: 2,          // Add a bottom border with a width of 2 pixels
     borderBottomColor: 'black',    // Set the color of the bottom border to black
-    paddingTop: 40,                // Add top padding to provide space from the status bar or top edge
     paddingLeft: 20,               // Add left padding to space the content away from the left edge
   },
   headerText: {
