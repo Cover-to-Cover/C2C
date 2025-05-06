@@ -191,12 +191,17 @@ export default function LikedScreen() {
     Share.share({ message: `Check out this book! ${url}` }, { dialogTitle: 'Share' });
   };
 
+  const CONVERT_ENDPOINT =
+  Platform.OS === 'web'
+    ? '/api/convert'                              // hits your Apache proxy + CORS
+    : 'https://app.rocketsource.io/api/v3/convert'; // native can call RS directly
+
   const handleCompareOffers = async () => {
     if (!selectedBook?.isbn13) return;
     setLoadingOffers(true);
 
     try {
-      const res = await fetch('https://app.rocketsource.io/api/v3/convert', {
+      const res = await fetch(CONVERT_ENDPOINT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
