@@ -223,8 +223,8 @@ export default function LikedScreen() {
       return;
     }
   
-    const url = `https://www.amazon.com/dp/${isbn10}`;
-    const message = `I loved the cover of this book!\n${url}`;
+    const amazonUrl = `https://www.amazon.com/dp/${selectedBook.isbn10}/ref=nosim?tag=covertocove06-20`;
+    const message = `I loved the cover of this book!\n${amazonUrl}`;
   
     Share.share(
       { message },
@@ -234,9 +234,17 @@ export default function LikedScreen() {
 
   // Open an external URL for comparing offers if ISBN-13 is available.
   const handleCompareOffers = () => {
-    if (selectedBook && selectedBook.isbn13) {
-      Linking.openURL(`https://www.directtextbook.com/isbn/${selectedBook.isbn13}`);
+    // make sure we have the ASIN (ISBN-10)
+    if (!selectedBook?.isbn10) {
+      Alert.alert('ISBN-10 not available');
+      return;
     }
+  
+    // build the URL here
+    const amazonUrl = `https://www.amazon.com/dp/${selectedBook.isbn10}/ref=nosim?tag=covertocove06-20`;
+    
+    // open it
+    Linking.openURL(amazonUrl);
   };
 
   if (loadingDetails) {
