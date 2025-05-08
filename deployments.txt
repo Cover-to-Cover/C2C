@@ -1,0 +1,9 @@
+DEPLOYMENTS
+
+cd /home/alexpatten/C2C && \
+git fetch --all && \
+git pull origin main && \
+npx expo export && \
+sudo rm -rf /var/www/html/* && \
+sudo cp -r dist/* /var/www/html/ && \
+sudo systemctl reload apache2
