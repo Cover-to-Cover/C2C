@@ -8,6 +8,10 @@ git pull origin main
 npx expo export
 sudo systemctl reload apache2
 
+
+
+
+
 cd /home/alexpatten/AlexPatten
 git remote set-url origin git@github.com:alexpatten/AlexPatten.git
 git pull origin main
