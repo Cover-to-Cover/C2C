@@ -1,17 +1,15 @@
 // lib/supabaseClient.ts
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL    = 'https://vwgxqonvaqvzhpqmearn.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3Z3hxb252YXF2emhwcW1lYXJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM1Mzk0MDMsImV4cCI6MjA1OTExNTQwM30.g5Z17a8SJJdLrgDlFh0hVWCdQU3v_aSjL_m2EbvmyKY';
+const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY,
   {
     auth: {
-      // after OAuth redirect Supabase will read the access_token in the URL
       detectSessionInUrl: true,
-      // store the session in React Native’s AsyncStorage
       persistSession: true,
     }
   }

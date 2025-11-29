@@ -140,16 +140,16 @@ export default function LikedScreen() {
     try {
       const workRes = await fetch(`https://openlibrary.org/works/${book.isbn}.json`);
       const workData = await workRes.json();
-  
+
       // Grab up to 20 editions so we have a better shot at finding an ISBN‑10
       const editionsRes = await fetch(`https://openlibrary.org/works/${book.isbn}/editions.json?limit=20`);
       const { entries } = await editionsRes.json();
-  
+
       // Find the first edition that has an isbn_10 array
       const bestEdition = entries.find((e: any) => Array.isArray(e.isbn_10) && e.isbn_10.length > 0) || entries[0] || {};
       const isbn10 = Array.isArray(bestEdition.isbn_10) ? bestEdition.isbn_10[0] : '';
       const isbn13 = Array.isArray(bestEdition.isbn_13) ? bestEdition.isbn_13[0] : '';
-  
+
       const extendedBook: LikedBook = {
         ...book,
         description:
@@ -161,7 +161,7 @@ export default function LikedScreen() {
         isbn10,
         isbn13,
       };
-  
+
       setSelectedBook(extendedBook);
       Animated.timing(slideAnim, { toValue: 0, duration: 300, useNativeDriver: true }).start();
     } catch (err) {
@@ -216,21 +216,21 @@ export default function LikedScreen() {
 
   const handleShare = () => {
     if (!selectedBook) return;
-  
+
     const { isbn10 } = selectedBook;
     if (!isbn10) {
       Alert.alert('Unable to find ISBN‑10 for sharing.');
       return;
     }
-  
+
     const amazonUrl = `https://www.amazon.com/dp/${selectedBook.isbn10}/ref=nosim?tag=covertocove06-20`;
     const message = `I loved the cover of this book!\n${amazonUrl}`;
-  
+
     Share.share(
       { message },
       { dialogTitle: 'Share this book' }
     ).catch(err => console.warn('Share error:', err));
-  };   
+  };
 
   // Open an external URL for comparing offers if ISBN-13 is available.
   const handleCompareOffers = () => {
@@ -239,10 +239,10 @@ export default function LikedScreen() {
       Alert.alert('ISBN-10 not available');
       return;
     }
-  
+
     // build the URL here
     const amazonUrl = `https://www.amazon.com/dp/${selectedBook.isbn10}/ref=nosim?tag=covertocove06-20`;
-    
+
     // open it
     Linking.openURL(amazonUrl);
   };
@@ -262,10 +262,15 @@ export default function LikedScreen() {
       <View style={styles.listContainer}>
         <ScrollView contentContainerStyle={styles.tableContainer}>
           <View style={styles.tableHeader}>
-            <Text style={[styles.tableCell, styles.headerCell]}>Title</Text>
-            <Text style={[styles.tableCell, styles.headerCell]}>Author</Text>
-            <Text style={[styles.tableCell, styles.headerCell]}>Liked on</Text>
-            <Text style={[styles.tableCell, styles.headerCell, { width: 40, textAlign: 'center' }]}>×</Text>
+            <View style={styles.mainCell}>
+              <Text style={[styles.tableCell, styles.headerCell]}>Title</Text>
+              <Text style={[styles.tableCell, styles.headerCell]}>Author</Text>
+              <Text style={[styles.tableCell, styles.headerCell]}>Liked on</Text>
+            </View>
+
+            <View style={styles.removeButtonCell}>
+              <Text style={[styles.headerCell, { color: 'white' }]}></Text>
+            </View>
           </View>
 
           {likedBooks.length === 0 ? (
@@ -287,6 +292,7 @@ export default function LikedScreen() {
                       : '-'}
                   </Text>
                 </TouchableOpacity>
+
                 <TouchableOpacity
                   style={styles.removeButtonCell}
                   onPress={() => handleQuickRemove(book)}

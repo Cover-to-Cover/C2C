@@ -1,9 +1,15 @@
+ssh alexpatten@192.168.5.100
+
 DEPLOYMENTS
 
-cd /home/alexpatten/C2C && \
-git fetch --all && \
-git pull origin main && \
-npx expo export && \
-sudo rm -rf /var/www/html/* && \
-sudo cp -r dist/* /var/www/html/ && \
+cd /home/alexpatten/C2C
+git remote set-url origin git@github.com:alexpatten/C2C.git
+git pull origin main
+npx expo export
+sudo systemctl reload apache2
+
+cd /home/alexpatten/AlexPatten
+git remote set-url origin git@github.com:alexpatten/AlexPatten.git
+git pull origin main
+npx expo export
 sudo systemctl reload apache2

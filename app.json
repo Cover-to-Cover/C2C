@@ -31,6 +31,9 @@
     },
     "web": {
       "favicon": "./assets/book.png"
-    }
+    },
+    "plugins": [
+      "expo-web-browser"
+    ]
   }
 }
