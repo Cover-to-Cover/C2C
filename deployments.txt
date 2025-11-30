@@ -3,7 +3,7 @@ ssh alexpatten@192.168.5.100
 DEPLOYMENTS
 
 cd /home/alexpatten/C2C
-git remote set-url origin git@github.com:alexpatten/C2C.git
+git remote set-url origin git@github.com:Cover-to-Cover/C2C.git
 git pull origin main
 npx expo export
 sudo systemctl reload apache2

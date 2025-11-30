@@ -1,4 +1,4 @@
-// app/login.tsx
+// app/login.tsx (or app/(auth)/login.tsx if that’s where it lives)
 import React, { useState, useEffect, useRef } from 'react';
 import {
   SafeAreaView,
@@ -11,12 +11,12 @@ import {
   useWindowDimensions,
   ScrollView,
   KeyboardAvoidingView,
-  Platform
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { makeRedirectUri } from 'expo-auth-session';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase } from '../../lib/supabaseClient'; // or '../lib/...' if file moved
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -27,18 +27,33 @@ export default function LoginScreen() {
   const router = useRouter();
   const passwordInputRef = useRef<TextInput>(null);
 
-  // hooks for dynamic layout
   const { height: screenHeight } = useWindowDimensions();
 
+  // If we already have a session, go straight to dashboard
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) router.replace('/dashboard');
+    const bootstrap = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session?.user) {
+        router.replace('/dashboard');
+      }
+    };
+
+    bootstrap();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        router.replace('/dashboard');
+      }
     });
-    const { data: listener } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (session?.user) router.replace('/dashboard');
-    });
-    return () => listener.subscription.unsubscribe();
-  }, []);
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [router]);
 
   const handleLogin = async () => {
     setErrorMessage('');
@@ -47,13 +62,37 @@ export default function LoginScreen() {
   };
 
   const handleGoogleLogin = async () => {
-    const redirectUri = makeRedirectUri({ scheme: 'cover-to-cover' });
+    setErrorMessage('');
+
+    // Where Supabase should send the user back AFTER Google login
+    const redirectTo =
+      Platform.OS === 'web'
+        ? window.location.origin // e.g. https://covertocoverapp.com
+        : makeRedirectUri({ scheme: 'cover-to-cover' });
+
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: 'https://www.covertocoverapp.com/dashboard' }
+      options: {
+        redirectTo,
+        // can also add scopes here if needed
+      },
     });
-    if (error) console.error(error.message);
-    else if (data.url) await WebBrowser.openBrowserAsync(data.url);
+
+    if (error) {
+      console.error('Google login error:', error.message);
+      setErrorMessage(error.message);
+      return;
+    }
+
+    if (data?.url) {
+      if (Platform.OS === 'web') {
+        // full-page redirect so Supabase can finish OAuth in this tab
+        window.location.href = data.url;
+      } else {
+        // native: open external browser for OAuth
+        await WebBrowser.openBrowserAsync(data.url);
+      }
+    }
   };
 
   const handleGoToRegister = () => router.push('/register');
@@ -68,12 +107,9 @@ export default function LoginScreen() {
           contentContainerStyle={[styles.container, { paddingTop: 20 }]}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Logo occupies remaining space above controls */}
-          <View style={[styles.logoContainer, { height: screenHeight * 0.5 }]}> 
-            <Image
-              source={require('../../assets/logo.png')}
-              style={styles.logo}
-            />
+          {/* Logo */}
+          <View style={[styles.logoContainer, { height: screenHeight * 0.5 }]}>
+            <Image source={require('../../assets/logo.png')} style={styles.logo} />
           </View>
 
           {/* Controls */}
