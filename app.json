@@ -1,39 +1,31 @@
 {
   "expo": {
-    "name": "Cover to Cover",
-    "slug": "cover-to-cover",
-    "owner": "alexpatten",
+    "name": "halalfinders-web",
+    "slug": "halalfinders-web",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/book.png",
-    "userInterfaceStyle": "light",
+    "icon": "./assets/images/hf_logo.png",
+    "scheme": "halalfindersweb",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
-      "supportsTablet": true,
-      "infoPlist": {
-        "LSApplicationQueriesSchemes": [
-          "fb",
-          "twitter",
-          "instagram"
-        ]
-      }
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "backgroundColor": "#E6F4FE"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/book.png"
+      "output": "static",
+      "favicon": "./assets/images/hf_logo.png",
+      "assetPrefix": "/"
     },
-    "plugins": [
-      "expo-web-browser"
-    ]
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
   }
 }
