@@ -1,4 +1,5 @@
 // app/about.tsx
+import { SiteFooter } from "@/components/site-footer";
 import { LOGO } from "@/constants/brand";
 import { router } from "expo-router";
 import {
@@ -113,6 +114,8 @@ export default function AboutPage() {
                                 way to help is to send it through the Support page.
                             </Text>
                         </View>
+
+                        <SiteFooter style={styles.footer} />
                     </View>
                 </ScrollView>
             </View>
@@ -210,5 +213,9 @@ const styles = StyleSheet.create({
         color: MUTED,
         fontSize: 14,
         lineHeight: 20,
+    },
+
+    footer: {
+        marginTop: 32,
     },
 });

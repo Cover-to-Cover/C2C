@@ -1,11 +1,9 @@
 // app/index.tsx
+import { SiteFooter } from "@/components/site-footer";
+import { StoreBadges } from "@/components/store-badges";
 import { LOGO } from "@/constants/brand";
-import { APP_STORE_URL } from "@/constants/links";
-import { router } from "expo-router";
 import {
   Image,
-  Linking,
-  Pressable,
   StyleSheet,
   Text,
   View,
@@ -13,14 +11,18 @@ import {
 } from "react-native";
 
 export default function HomePage() {
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
+
+  // Square, up to 500x500. Shrinks on narrow or short viewports so the hero
+  // and the footer still fit without the page needing to scroll.
+  const logoSize = Math.min(width * 0.8, height * 0.5, 500);
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <Image
         source={LOGO}
-        style={{ width: Math.min(width * 0.7, 480), height: 140 }}
+        style={{ width: logoSize, height: logoSize }}
         resizeMode="contain"
       />
 
@@ -33,43 +35,11 @@ export default function HomePage() {
           finding a book into the best part of reading it.
         </Text>
 
-        {APP_STORE_URL ? (
-          <Pressable onPress={() => Linking.openURL(APP_STORE_URL)}>
-            <Image
-              source={{ uri: "https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" }}
-              style={styles.appStoreBadge}
-              resizeMode="contain"
-            />
-          </Pressable>
-        ) : (
-          <Text style={styles.comingSoon}>Coming soon to the App Store</Text>
-        )}
+        <StoreBadges />
       </View>
 
       {/* Footer */}
-      <View style={styles.footerContainer}>
-        <View style={styles.footerLinks}>
-          <Pressable onPress={() => router.push("/support")}>
-            <Text style={styles.footerLink}>Contact</Text>
-          </Pressable>
-
-          <Text style={styles.footerSeparator}>·</Text>
-
-          <Pressable onPress={() => router.push("/privacy")}>
-            <Text style={styles.footerLink}>Privacy</Text>
-          </Pressable>
-
-          <Text style={styles.footerSeparator}>·</Text>
-
-          <Pressable onPress={() => router.push("/about")}>
-            <Text style={styles.footerLink}>About</Text>
-          </Pressable>
-        </View>
-
-        <Text style={styles.footer}>
-          © {new Date().getFullYear()} Cover to Cover
-        </Text>
-      </View>
+      <SiteFooter style={styles.footer} />
     </View>
   );
 }
@@ -80,7 +50,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#022831",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 48,
+    paddingTop: 48,
+    paddingBottom: 88, // leaves room for the absolutely-positioned footer
   },
 
   hero: {
@@ -105,43 +76,8 @@ const styles = StyleSheet.create({
     lineHeight: 26,
   },
 
-  appStoreBadge: {
-    width: 180,
-    height: 60,
-  },
-
-  comingSoon: {
-    color: "#08c7f7",
-    fontSize: 15,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-  },
-
-  footerContainer: {
+  footer: {
     position: "absolute",
     bottom: 24,
-    alignItems: "center",
-  },
-
-  footerLinks: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 6,
-  },
-
-  footerLink: {
-    color: "#9fb7bf",
-    fontSize: 13,
-    fontWeight: "500",
-  },
-
-  footerSeparator: {
-    color: "#9fb7bf",
-    marginHorizontal: 8,
-  },
-
-  footer: {
-    color: "#9fb7bf",
-    fontSize: 12,
   },
 });

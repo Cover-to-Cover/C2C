@@ -1,3 +1,4 @@
+import { SiteFooter } from "@/components/site-footer";
 import { SUPPORT_EMAIL } from "@/constants/links";
 import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -14,6 +15,8 @@ export default function ResetPassword() {
       <Pressable onPress={() => Linking.openURL(`mailto:${SUPPORT_EMAIL}`)}>
         <Text style={styles.link}>Having trouble? {SUPPORT_EMAIL}</Text>
       </Pressable>
+
+      <SiteFooter style={styles.footer} />
     </View>
   );
 }
@@ -48,5 +51,10 @@ const styles = StyleSheet.create({
     color: "#08c7f7",
     fontSize: 15,
     fontWeight: "600",
+  },
+
+  footer: {
+    position: "absolute",
+    bottom: 24,
   },
 });

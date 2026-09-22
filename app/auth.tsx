@@ -1,3 +1,4 @@
+import { SiteFooter } from "@/components/site-footer";
 import { router } from "expo-router";
 import { useEffect } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
@@ -28,6 +29,8 @@ export default function AuthRedirect() {
       <Text style={styles.subtitle}>
         You can return to the Cover to Cover app.
       </Text>
+
+      <SiteFooter style={styles.footer} />
     </View>
   );
 }
@@ -56,5 +59,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 26,
     maxWidth: 420,
+  },
+
+  footer: {
+    position: "absolute",
+    bottom: 24,
   },
 });

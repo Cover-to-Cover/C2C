@@ -1,3 +1,4 @@
+import { SiteFooter } from "@/components/site-footer";
 import { LOGO } from "@/constants/brand";
 import { SUPPORT_EMAIL } from "@/constants/links";
 import { router } from "expo-router";
@@ -58,9 +59,7 @@ export default function SupportPage() {
       </View>
 
       {/* Footer */}
-      <Text style={styles.footer}>
-        © {new Date().getFullYear()} Cover to Cover
-      </Text>
+      <SiteFooter style={styles.footer} />
     </View>
   );
 }
@@ -118,8 +117,6 @@ const styles = StyleSheet.create({
   },
 
   footer: {
-    color: "#9fb7bf",
-    fontSize: 12,
     position: "absolute",
     bottom: 24,
   },
