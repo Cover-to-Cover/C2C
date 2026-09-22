@@ -6,128 +6,171 @@ import {
   Image,
   Linking,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
   useWindowDimensions,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+const BG = "#022831";
+const ACCENT = "#08c7f7";
+const CARD = "rgba(0,0,0,0.35)";
+const BORDER = "rgba(255,255,255,0.08)";
+const TEXT = "#FFFFFF";
+const MUTED = "rgba(255,255,255,0.75)";
 
 export default function SupportPage() {
   const { width } = useWindowDimensions();
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <Pressable
-        onPress={() => router.push("/")}
-        accessibilityRole="button"
-        style={({ pressed }) => [
-          styles.logoPressable,
-          pressed && styles.logoPressed,
-        ]}
-      >
-        <Image
-          source={LOGO}
-          style={{
-            width: width * 0.7,
-            maxWidth: 480,
-            height: 140,
-          }}
-          resizeMode="contain"
-        />
-      </Pressable>
+    <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
+      <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.content}>
+          <View style={styles.inner}>
+            {/* Header */}
+            <View style={styles.header}>
+              <Pressable
+                onPress={() => router.push("/")}
+                accessibilityRole="button"
+                style={({ pressed }) => [
+                  styles.logoPressable,
+                  pressed && styles.logoPressed,
+                ]}
+              >
+                <Image
+                  source={LOGO}
+                  style={{
+                    width: width * 0.7,
+                    maxWidth: 480,
+                    height: 140,
+                    marginBottom: 12,
+                  }}
+                  resizeMode="contain"
+                />
+              </Pressable>
 
-      {/* Content */}
-      <View style={styles.hero}>
-        <Text style={styles.title}>Support</Text>
+              <Text style={styles.title}>Support</Text>
+              <Text style={styles.subtitle}>
+                Need help, found a book with wrong details, or have feedback
+                about Cover to Cover?
+              </Text>
+            </View>
 
-        <Text style={styles.subtitle}>
-          Need help, found a book with wrong details, or have feedback about
-          Cover to Cover?
-        </Text>
+            {/* Everything lives in one card */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Get in Touch</Text>
 
-        <Text style={styles.body}>
-          Reach out anytime and we’ll get back to you as soon as possible.
-        </Text>
+              <Text style={styles.cardText}>
+                Email us any time and we’ll get back to you as soon as we can.
+                Bug reports, a book with the wrong cover or blurb, a title you
+                want added, or just an idea for the app. All of it is welcome.
+              </Text>
 
-        <Pressable
-          style={styles.button}
-          onPress={() => Linking.openURL(`mailto:${SUPPORT_EMAIL}`)}
-        >
-          <Text style={styles.buttonText}>{SUPPORT_EMAIL}</Text>
-        </Pressable>
+              <Pressable
+                style={styles.button}
+                onPress={() => Linking.openURL(`mailto:${SUPPORT_EMAIL}`)}
+                accessibilityRole="link"
+              >
+                <Text style={styles.buttonText}>{SUPPORT_EMAIL}</Text>
+              </Pressable>
+            </View>
+
+            <SiteFooter style={styles.footer} />
+          </View>
+        </ScrollView>
       </View>
-
-      {/* Footer */}
-      <SiteFooter style={styles.footer} />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: BG, // ensures status bar / notch area matches
+  },
   container: {
     flex: 1,
-    backgroundColor: "#022831",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 48,
+    backgroundColor: BG,
+  },
+  content: {
+    padding: 48,
+    paddingBottom: 50,
+  },
+  inner: {
+    width: "100%",
+    maxWidth: 720,
+    alignSelf: "center",
   },
 
-  hero: {
-    maxWidth: 720,
-    paddingHorizontal: 24,
+  header: {
     alignItems: "center",
+    marginBottom: 18,
+  },
+
+  // clickable logo
+  logoPressable: {
+    borderRadius: 16,
+    padding: 6,
+  },
+  logoPressed: {
+    opacity: 0.85,
   },
 
   title: {
-    color: "#ffffff",
-    fontSize: 42,
+    color: TEXT,
+    fontSize: 28,
     fontWeight: "800",
     textAlign: "center",
-    marginBottom: 16,
   },
-
   subtitle: {
-    color: "#9fb7bf",
-    fontSize: 18,
+    color: MUTED,
+    fontSize: 14,
     textAlign: "center",
-    marginBottom: 16,
-    lineHeight: 26,
+    marginTop: 8,
+    maxWidth: 520,
+    lineHeight: 20,
   },
 
-  body: {
-    color: "#9fb7bf",
-    fontSize: 16,
-    textAlign: "center",
-    marginBottom: 32,
-    lineHeight: 24,
+  card: {
+    backgroundColor: CARD,
+    borderColor: BORDER,
+    borderWidth: 1,
+    borderRadius: 16,
+    padding: 20,
+    marginTop: 12,
+  },
+
+  cardTitle: {
+    color: TEXT,
+    fontSize: 18,
+    fontWeight: "800",
+    marginBottom: 8,
+  },
+  cardText: {
+    color: MUTED,
+    fontSize: 14,
+    lineHeight: 20,
+    marginTop: 6,
   },
 
   button: {
-    backgroundColor: "#08c7f7",
+    backgroundColor: ACCENT,
     paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 10,
+    alignItems: "center",
+    alignSelf: "center",
+    marginTop: 20,
   },
-
   buttonText: {
-    color: "#022831",
+    color: BG,
     fontSize: 16,
     fontWeight: "700",
   },
 
   footer: {
-    position: "absolute",
-    bottom: 24,
-  },
-
-  logoPressable: {
-    borderRadius: 16,
-    padding: 6,
-    marginBottom: 12,
-  },
-
-  logoPressed: {
-    opacity: 0.85,
+    marginTop: 32,
   },
 });

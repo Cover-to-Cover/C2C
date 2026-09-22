@@ -61,15 +61,15 @@ export default function AboutPage() {
 
                             <Text style={styles.cardText}>
                                 Cover to Cover is a book discovery app that works the way Tinder
-                                and Bumble do — except here you are supposed to judge a book by
-                                its cover. Covers come at you one at a time. Swipe right on the
-                                ones that pull you in, swipe left on the ones that don’t, and
-                                match with your next read.
+                                and Bumble do, except here the whole point is to judge freely.
+                                Covers come at you one at a time. Swipe right on the ones that
+                                pull you in, swipe left on the ones that don’t, and match with
+                                your next read.
                             </Text>
                             <Text style={styles.cardText}>
                                 Every book has to sell itself in a single image, so trust your
                                 gut. No bestseller lists, no algorithmic ranking, no wall of
-                                reviews to wade through before you can decide — just the cover,
+                                reviews to wade through before you can decide. Just the cover,
                                 the same way you would find a book by wandering a bookstore and
                                 pulling one off the shelf because it looked good.
                             </Text>

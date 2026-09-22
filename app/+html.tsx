@@ -11,7 +11,7 @@ export default function RootHtml({ children }: { children: React.ReactNode }) {
         <title>Cover to Cover</title>
         <meta
           name="description"
-          content="Swipe through book covers and match with your next read. Cover to Cover is book discovery for people who judge a book by its cover."
+          content="Judge freely. Swipe through book covers and match with your next read. Cover to Cover is book discovery for people who pick by the art."
         />
         <ScrollViewStyleReset />
 

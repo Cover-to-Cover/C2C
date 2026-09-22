@@ -28,11 +28,11 @@ export default function HomePage() {
 
       {/* Hero */}
       <View style={styles.hero}>
-        <Text style={styles.title}>Judge a book by its cover.</Text>
+        <Text style={styles.title}>Judge freely.</Text>
 
         <Text style={styles.subtitle}>
-          Swipe through covers, match with your next read. Cover to Cover turns
-          finding a book into the best part of reading it.
+          Swipe through covers and judge away. Cover to Cover is book discovery
+          for people who pick by the art.
         </Text>
 
         <StoreBadges />
