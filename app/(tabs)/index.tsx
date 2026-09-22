@@ -31,8 +31,7 @@ export default function HomePage() {
         <Text style={styles.title}>Judge freely.</Text>
 
         <Text style={styles.subtitle}>
-          Swipe through covers and judge away. Cover to Cover is book discovery
-          for people who pick by the art.
+          A book discovery app for people who pick by the art.
         </Text>
 
         <StoreBadges />
