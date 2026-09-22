@@ -3,7 +3,7 @@
 # it exits quietly when nothing changed and only touches dist/ after a build
 # succeeds, so a failed build never takes the live site down.
 #
-# Server: ~/apps/websites/halalfinders/source (nginx container mounts ./dist)
+# Server: ~/apps/websites/covertocover/source (nginx container mounts ./dist)
 #
 # Everything lives in main() and the file ends with `main; exit` on one line:
 # bash reads scripts incrementally, and `git reset --hard` rewrites this very
@@ -15,7 +15,7 @@ main() {
   cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
   export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
-  local LOG="${DEPLOY_LOG:-/tmp/halalfinders-deploy.log}"
+  local LOG="${DEPLOY_LOG:-/tmp/covertocover-deploy.log}"
   log() { echo "$(date '+%F %T') $*" | tee -a "$LOG"; }
 
   git fetch -q origin main
@@ -63,9 +63,9 @@ main() {
 # If the container's view of dist/ is empty (dangling bind mount), restart it.
 ensure_mount() {
   command -v docker >/dev/null || return 0
-  if ! docker exec halalfinders test -f /usr/share/nginx/html/index.html 2>/dev/null; then
-    echo "$(date '+%F %T') container mount stale; restarting nginx" | tee -a "${DEPLOY_LOG:-/tmp/halalfinders-deploy.log}"
-    docker restart halalfinders >/dev/null 2>&1 || true
+  if ! docker exec covertocover test -f /usr/share/nginx/html/index.html 2>/dev/null; then
+    echo "$(date '+%F %T') container mount stale; restarting nginx" | tee -a "${DEPLOY_LOG:-/tmp/covertocover-deploy.log}"
+    docker restart covertocover >/dev/null 2>&1 || true
   fi
 }
 

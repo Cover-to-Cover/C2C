@@ -1,50 +1,46 @@
-# Welcome to your Expo app 👋
+# Cover to Cover — web
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Marketing and legal site for **Cover to Cover**, the book discovery app where
+you swipe through covers and match with your next read. Built with
+[Expo](https://expo.dev) + [expo-router](https://docs.expo.dev/router/introduction)
+and exported as a static site.
 
-## Get started
+## Pages
 
-1. Install dependencies
+| Route             | What it is                                            |
+| ----------------- | ----------------------------------------------------- |
+| `/`               | Landing page — tagline and App Store link             |
+| `/about`          | Mission and how the app works                         |
+| `/privacy`        | Privacy policy                                        |
+| `/support`        | Contact — help@covertocoverapp.com                    |
+| `/auth`           | Supabase auth redirect target (password recovery)     |
+| `/reset-password` | Where `/auth` lands after a recovery link signs you in |
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Develop
 
 ```bash
-npm run reset-project
+npm install
+npx expo start --web
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Supabase credentials come from `.env` (git-ignored):
 
-## Learn more
+```
+EXPO_PUBLIC_SUPABASE_URL=...
+EXPO_PUBLIC_SUPABASE_ANON_KEY=...
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+The client is created lazily, so a build without them still succeeds — only the
+auth redirect degrades.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Build
 
-## Join the community
+```bash
+npx expo export --platform web --output-dir dist
+```
 
-Join our community of developers creating universal apps.
+## Deploy
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+`scripts/deploy.sh` runs on the server (safe to cron): it fetches `origin/main`,
+rebuilds only when the deployed commit differs, and updates `dist/` in place so
+the nginx bind mount stays valid.

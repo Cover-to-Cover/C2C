@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "halalfinders-web",
-    "slug": "halalfinders-web",
+    "name": "cover-to-cover-web",
+    "slug": "cover-to-cover-web",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/hf_logo.png",
-    "scheme": "halalfindersweb",
+    "icon": "./assets/images/c2c_logo.png",
+    "scheme": "covertocoverweb",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -20,7 +20,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/hf_logo.png",
+      "favicon": "./assets/images/c2c_logo.png",
       "assetPrefix": "/"
     },
     "experiments": {

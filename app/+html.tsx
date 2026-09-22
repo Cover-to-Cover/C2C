@@ -8,6 +8,11 @@ export default function RootHtml({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Cover to Cover</title>
+        <meta
+          name="description"
+          content="Swipe through book covers and match with your next read. Cover to Cover is book discovery for people who judge a book by its cover."
+        />
         <ScrollViewStyleReset />
 
         {/* Buy Me a Coffee widget */}

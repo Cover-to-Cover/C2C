@@ -1,3 +1,5 @@
+import { LOGO } from "@/constants/brand";
+import { SUPPORT_EMAIL } from "@/constants/links";
 import { router } from "expo-router";
 import {
   Image,
@@ -10,7 +12,6 @@ import {
 } from "react-native";
 
 export default function SupportPage() {
-  const email = "support@halalfinders.com";
   const { width } = useWindowDimensions();
 
   return (
@@ -25,7 +26,7 @@ export default function SupportPage() {
         ]}
       >
         <Image
-          source={require("../../assets/images/halalfinders_logo.png")}
+          source={LOGO}
           style={{
             width: width * 0.7,
             maxWidth: 480,
@@ -40,7 +41,8 @@ export default function SupportPage() {
         <Text style={styles.title}>Support</Text>
 
         <Text style={styles.subtitle}>
-          Need help, found an issue, or have feedback about HalalFinders?
+          Need help, found a book with wrong details, or have feedback about
+          Cover to Cover?
         </Text>
 
         <Text style={styles.body}>
@@ -49,15 +51,15 @@ export default function SupportPage() {
 
         <Pressable
           style={styles.button}
-          onPress={() => Linking.openURL(`mailto:${email}`)}
+          onPress={() => Linking.openURL(`mailto:${SUPPORT_EMAIL}`)}
         >
-          <Text style={styles.buttonText}>{email}</Text>
+          <Text style={styles.buttonText}>{SUPPORT_EMAIL}</Text>
         </Pressable>
       </View>
 
       {/* Footer */}
       <Text style={styles.footer}>
-        © {new Date().getFullYear()} HalalFinders
+        © {new Date().getFullYear()} Cover to Cover
       </Text>
     </View>
   );

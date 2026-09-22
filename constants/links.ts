@@ -1,10 +1,11 @@
 // constants/links.ts
-export const APP_STORE_URL =
-  "https://apps.apple.com/us/app/halalfinders/id6758252277";
 
-/** Custom scheme registered by the mobile app (app.json "scheme"). */
-export const APP_SCHEME = "halalfinders://";
+/**
+ * App Store listing for Cover to Cover.
+ * TODO: fill in once the app is live — while this is empty the home page
+ * shows a "coming soon" note instead of a broken App Store badge.
+ */
+export const APP_STORE_URL = "";
 
-export function appDeepLink(path: string) {
-  return `${APP_SCHEME}${path.replace(/^\//, "")}`;
-}
+/** Where people reach us. */
+export const SUPPORT_EMAIL = "help@covertocoverapp.com";

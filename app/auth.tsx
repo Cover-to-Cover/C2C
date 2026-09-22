@@ -26,7 +26,7 @@ export default function AuthRedirect() {
       <ActivityIndicator color="#08c7f7" size="large" />
       <Text style={styles.title}>Finishing sign-in…</Text>
       <Text style={styles.subtitle}>
-        You can return to the HalalFinders app.
+        You can return to the Cover to Cover app.
       </Text>
     </View>
   );
@@ -36,7 +36,7 @@ export default function AuthRedirect() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#022831", // SAME dark HF background
+    backgroundColor: "#022831", // SAME dark Cover to Cover background
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 24,
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   },
 
   subtitle: {
-    color: "#9fb7bf", // SAME muted HF text
+    color: "#9fb7bf", // SAME muted Cover to Cover text
     fontSize: 18,
     textAlign: "center",
     lineHeight: 26,

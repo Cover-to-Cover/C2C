@@ -1,4 +1,5 @@
 // app/about.tsx
+import { LOGO } from "@/constants/brand";
 import { router } from "expo-router";
 import {
     Image,
@@ -24,108 +25,94 @@ export default function AboutPage() {
         <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
             <View style={styles.container}>
                 <ScrollView contentContainerStyle={styles.content}>
-                    {/* Header */}
-                    <View style={styles.header}>
-                        <Pressable
-                            onPress={() => router.push("/")}
-                            accessibilityRole="button"
-                            style={({ pressed }) => [
-                                styles.logoPressable,
-                                pressed && styles.logoPressed,
-                            ]}
-                        >
-                            <Image
-                                source={require("../../assets/images/halalfinders_logo.png")}
-                                style={{
-                                    width: width * 0.7,
-                                    maxWidth: 480,
-                                    height: 140,
-                                    marginBottom: 12,
-                                }}
-                                resizeMode="contain"
-                            />
-                        </Pressable>
+                    <View style={styles.inner}>
+                        {/* Header */}
+                        <View style={styles.header}>
+                            <Pressable
+                                onPress={() => router.push("/")}
+                                accessibilityRole="button"
+                                style={({ pressed }) => [
+                                    styles.logoPressable,
+                                    pressed && styles.logoPressed,
+                                ]}
+                            >
+                                <Image
+                                    source={LOGO}
+                                    style={{
+                                        width: width * 0.7,
+                                        maxWidth: 480,
+                                        height: 140,
+                                        marginBottom: 12,
+                                    }}
+                                    resizeMode="contain"
+                                />
+                            </Pressable>
 
-                        <Text style={styles.title}>About HalalFinders</Text>
-                        <Text style={styles.subtitle}>
-                            Helping Muslims find halal spots and places to pray—anywhere.
-                        </Text>
-                    </View>
-
-                    {/* Mission */}
-                    <View style={styles.card}>
-                        <Text style={styles.cardTitle}>Our Mission</Text>
-                        <Text style={styles.cardText}>
-                            HalalFinders exists to make it easier to live your deen on the go.
-                            Whether you’re traveling, new to an area, or just exploring your
-                            own city, the goal is simple: find halal food, find masajid, and
-                            feel confident about it.
-                        </Text>
-                        <Text style={styles.cardText}>
-                            We focus on clarity and trust—showing you nearby options,
-                            highlighting what’s verified, and making it easy for the community
-                            to contribute.
-                        </Text>
-                    </View>
-
-                    {/* Why */}
-                    <View style={styles.card}>
-                        <Text style={styles.cardTitle}>Why I Built It</Text>
-                        <Text style={styles.cardText}>
-                            I wanted something fast and practical—an app you can open, search,
-                            and immediately know where to go. No digging through dozens of
-                            reviews or guessing what “halal-ish” means.
-                        </Text>
-                        <Text style={styles.cardText}>
-                            The vision is a community-powered map where people can help each
-                            other by verifying places and keeping info fresh.
-                        </Text>
-                    </View>
-
-                    {/* About you */}
-                    <View style={styles.card}>
-                        <Text style={styles.cardTitle}>About the Developer</Text>
-                        <Text style={styles.cardText}>
-                            My name is Alex, and I’m the developer and owner of HalalFinders.
-                            I’ve been a revert for over 6 years and I practice Islam.
-                        </Text>
-                        <Text style={styles.cardText}>
-                            I’m building HalalFinders with a lot of care because I’m solving a
-                            problem I personally deal with: finding trustworthy halal options
-                            and nearby places to pray—especially when traveling or in
-                            unfamiliar areas.
-                        </Text>
-                    </View>
-
-                    {/* Values / What to expect */}
-                    <View style={styles.card}>
-                        <Text style={styles.cardTitle}>What You Can Expect</Text>
-
-                        <View style={styles.bullets}>
-                            <Text style={styles.bullet}>
-                                <Text style={styles.bulletAccent}>• </Text>
-                                <Text style={styles.bulletText}>
-                                    Simple and fast discovery (food + masajid).
-                                </Text>
-                            </Text>
-                            <Text style={styles.bullet}>
-                                <Text style={styles.bulletAccent}>• </Text>
-                                <Text style={styles.bulletText}>
-                                    Community-driven verification to improve trust.
-                                </Text>
-                            </Text>
-                            <Text style={styles.bullet}>
-                                <Text style={styles.bulletAccent}>• </Text>
-                                <Text style={styles.bulletText}>
-                                    Continuous updates as the app grows.
-                                </Text>
+                            <Text style={styles.title}>About Cover to Cover</Text>
+                            <Text style={styles.subtitle}>
+                                Swipe through book covers and match with your next read.
                             </Text>
                         </View>
 
-                        <Text style={[styles.cardText, { marginTop: 12 }]}>
-                            If you spot incorrect info or want a place added, the best way to
-                            help is to share feedback through the Support page.
-                        </Text>
+                        {/* Everything lives in one card */}
+                        <View style={styles.card}>
+                            <Text style={styles.cardTitle}>Our Mission</Text>
+
+                            <Text style={styles.cardText}>
+                                Cover to Cover is a book discovery app that works the way Tinder
+                                and Bumble do — except here you are supposed to judge a book by
+                                its cover. Covers come at you one at a time. Swipe right on the
+                                ones that pull you in, swipe left on the ones that don’t, and
+                                match with your next read.
+                            </Text>
+                            <Text style={styles.cardText}>
+                                Every book has to sell itself in a single image, so trust your
+                                gut. No bestseller lists, no algorithmic ranking, no wall of
+                                reviews to wade through before you can decide — just the cover,
+                                the same way you would find a book by wandering a bookstore and
+                                pulling one off the shelf because it looked good.
+                            </Text>
+                            <Text style={styles.cardText}>
+                                Like what you see? Tap through for the title, author, and blurb,
+                                then save it to your shelf for later. The more you swipe, the
+                                better we get at knowing the kind of cover that stops you.
+                            </Text>
+
+                            <Text style={styles.sectionHeading}>How It Works</Text>
+                            <View style={styles.bullets}>
+                                <Text style={styles.bullet}>
+                                    <Text style={styles.bulletAccent}>• </Text>
+                                    <Text style={styles.bulletText}>
+                                        Swipe right on covers you like, left on the ones you don’t.
+                                    </Text>
+                                </Text>
+                                <Text style={styles.bullet}>
+                                    <Text style={styles.bulletAccent}>• </Text>
+                                    <Text style={styles.bulletText}>
+                                        Match to reveal the title, author, and description.
+                                    </Text>
+                                </Text>
+                                <Text style={styles.bullet}>
+                                    <Text style={styles.bulletAccent}>• </Text>
+                                    <Text style={styles.bulletText}>
+                                        Save matches to your shelf and build a reading list you
+                                        actually want to get to.
+                                    </Text>
+                                </Text>
+                                <Text style={styles.bullet}>
+                                    <Text style={styles.bulletAccent}>• </Text>
+                                    <Text style={styles.bulletText}>
+                                        Get recommendations that learn from your taste in covers,
+                                        not from a chart.
+                                    </Text>
+                                </Text>
+                            </View>
+
+                            <Text style={[styles.cardText, { marginTop: 16 }]}>
+                                Spot a book with wrong details, or want one added? The fastest
+                                way to help is to send it through the Support page.
+                            </Text>
+                        </View>
                     </View>
                 </ScrollView>
             </View>
@@ -166,13 +153,6 @@ const styles = StyleSheet.create({
         opacity: 0.85,
     },
 
-    // ✅ bigger logo
-    logo: {
-        width: 360,
-        height: 110,
-        marginBottom: 6,
-    },
-
     title: {
         color: TEXT,
         fontSize: 28,
@@ -193,7 +173,7 @@ const styles = StyleSheet.create({
         borderColor: BORDER,
         borderWidth: 1,
         borderRadius: 16,
-        padding: 16,
+        padding: 20,
         marginTop: 12,
     },
 
@@ -202,6 +182,12 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: "800",
         marginBottom: 8,
+    },
+    sectionHeading: {
+        color: TEXT,
+        fontSize: 16,
+        fontWeight: "800",
+        marginTop: 20,
     },
     cardText: {
         color: MUTED,
@@ -223,39 +209,6 @@ const styles = StyleSheet.create({
     bulletText: {
         color: MUTED,
         fontSize: 14,
-        lineHeight: 20,
-    },
-
-    buttonPrimaryWide: {
-        backgroundColor: ACCENT,
-        paddingVertical: 12,
-        paddingHorizontal: 14,
-        borderRadius: 12,
-        marginTop: 12,
-        alignItems: "center",
-    },
-    buttonPrimaryText: {
-        color: "#001018",
-        fontWeight: "800",
-    },
-
-    footerCard: {
-        backgroundColor: "rgba(8,199,247,0.10)",
-        borderColor: "rgba(8,199,247,0.45)",
-        borderWidth: 1,
-        borderRadius: 16,
-        padding: 16,
-        marginTop: 16,
-    },
-    footerTitle: {
-        color: TEXT,
-        fontSize: 16,
-        fontWeight: "900",
-    },
-    footerText: {
-        color: MUTED,
-        fontSize: 14,
-        marginTop: 6,
         lineHeight: 20,
     },
 });

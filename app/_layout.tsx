@@ -10,7 +10,7 @@ export default function RootLayout() {
         screenOptions={{
           headerShown: false,
           contentStyle: {
-            backgroundColor: "#022831", // HalalFinders dark background
+            backgroundColor: "#022831", // Cover to Cover dark background
           },
         }}
       />

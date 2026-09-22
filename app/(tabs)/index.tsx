@@ -1,4 +1,5 @@
 // app/index.tsx
+import { LOGO } from "@/constants/brand";
 import { APP_STORE_URL } from "@/constants/links";
 import { router } from "expo-router";
 import {
@@ -7,34 +8,42 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  View
+  View,
+  useWindowDimensions
 } from "react-native";
 
 export default function HomePage() {
+  const { width } = useWindowDimensions();
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <Image
-        source={require("../../assets/images/halalfinders_logo.png")}
-        style={{ width: 4750, height: 275 }}
+        source={LOGO}
+        style={{ width: Math.min(width * 0.7, 480), height: 140 }}
         resizeMode="contain"
       />
 
       {/* Hero */}
       <View style={styles.hero}>
-        <Text style={styles.title}>Find Halal. Anywhere.</Text>
+        <Text style={styles.title}>Judge a book by its cover.</Text>
 
         <Text style={styles.subtitle}>
-          Discover halal restaurants, mosques, and verified spots near you.
+          Swipe through covers, match with your next read. Cover to Cover turns
+          finding a book into the best part of reading it.
         </Text>
 
-        <Pressable onPress={() => Linking.openURL(APP_STORE_URL)}>
-          <Image
-            source={{ uri: "https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" }}
-            style={styles.appStoreBadge}
-            resizeMode="contain"
-          />
-        </Pressable>
+        {APP_STORE_URL ? (
+          <Pressable onPress={() => Linking.openURL(APP_STORE_URL)}>
+            <Image
+              source={{ uri: "https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" }}
+              style={styles.appStoreBadge}
+              resizeMode="contain"
+            />
+          </Pressable>
+        ) : (
+          <Text style={styles.comingSoon}>Coming soon to the App Store</Text>
+        )}
       </View>
 
       {/* Footer */}
@@ -58,7 +67,7 @@ export default function HomePage() {
         </View>
 
         <Text style={styles.footer}>
-          © {new Date().getFullYear()} HalalFinders
+          © {new Date().getFullYear()} Cover to Cover
         </Text>
       </View>
     </View>
@@ -99,6 +108,13 @@ const styles = StyleSheet.create({
   appStoreBadge: {
     width: 180,
     height: 60,
+  },
+
+  comingSoon: {
+    color: "#08c7f7",
+    fontSize: 15,
+    fontWeight: "700",
+    letterSpacing: 0.5,
   },
 
   footerContainer: {
