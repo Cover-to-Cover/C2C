@@ -1,6 +1,6 @@
 // app/about.tsx
 import { SiteFooter } from "@/components/site-footer";
-import { LOGO } from "@/constants/brand";
+import { LOGO, LOGO_HEADER_WIDTH } from "@/constants/brand";
 import { router } from "expo-router";
 import {
     Image,
@@ -9,7 +9,6 @@ import {
     StyleSheet,
     Text,
     View,
-    useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -21,7 +20,6 @@ const TEXT = "#FFFFFF";
 const MUTED = "rgba(255,255,255,0.75)";
 
 export default function AboutPage() {
-    const { width } = useWindowDimensions();
     return (
         <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
             <View style={styles.container}>
@@ -40,8 +38,7 @@ export default function AboutPage() {
                                 <Image
                                     source={LOGO}
                                     style={{
-                                        width: width * 0.7,
-                                        maxWidth: 480,
+                                        width: LOGO_HEADER_WIDTH,
                                         height: 140,
                                         marginBottom: 12,
                                     }}

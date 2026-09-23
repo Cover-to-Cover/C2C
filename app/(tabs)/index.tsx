@@ -1,28 +1,16 @@
 // app/index.tsx
 import { SiteFooter } from "@/components/site-footer";
 import { StoreBadges } from "@/components/store-badges";
-import { LOGO } from "@/constants/brand";
-import {
-  Image,
-  StyleSheet,
-  Text,
-  View,
-  useWindowDimensions
-} from "react-native";
+import { LOGO, LOGO_HERO_SIZE } from "@/constants/brand";
+import { Image, StyleSheet, Text, View } from "react-native";
 
 export default function HomePage() {
-  const { width, height } = useWindowDimensions();
-
-  // Square, up to 500x500. Shrinks on narrow or short viewports so the hero
-  // and the footer still fit without the page needing to scroll.
-  const logoSize = Math.min(width * 0.8, height * 0.5, 500);
-
   return (
     <View style={styles.container}>
       {/* Header */}
       <Image
         source={LOGO}
-        style={{ width: logoSize, height: logoSize }}
+        style={{ width: LOGO_HERO_SIZE, height: LOGO_HERO_SIZE }}
         resizeMode="contain"
       />
 
